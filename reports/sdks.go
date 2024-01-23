@@ -37,7 +37,7 @@ var (
 			Repo:         "TBD54566975/tbdex-js",
 			ArtifactName: "junit-results",
 			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`.* TbdexTestVectors\w+ (\w+)`),
+			VectorRegex:  regexp.MustCompile(`TbdexTestVectors(\w+) (\w+)`),
 			VectorPath:   "tbdex-test-vectors",
 			Type:         "tbdex",
 		},
@@ -69,37 +69,15 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
-		// DEBUG
-		fmt.Println("~~~SUITES:~~~")
-		for _, suite := range suites {
-			fmt.Println(suite.Name)
-			fmt.Println(suite.Totals.Passed)
-		}
-
 		report, err := sdk.buildReport(suites)
 		if err != nil {
 			return nil, fmt.Errorf("error processing data from %s: %v", sdk.Repo, err)
-		}
-
-		// DEBUG
-		fmt.Println("~~~REPORT RESULT:~~~")
-		for _, result := range report.Results {
-			fmt.Println(result)
 		}
 
 		reports = append(reports, report)
 	}
 
 	return reports, nil
-}
-
-func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
-	data, err := os.ReadFile("../results.zip")
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
 }
 
 func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
@@ -148,4 +126,15 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	slog.Info("downloaded artifact", "sdk", sdk.Repo, "size", len(artifact))
 
 	return artifact, nil
+}
+
+// Used for testing purposes
+func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
+	//data, err := os.ReadFile("../results.zip")
+	data, err := os.ReadFile("../tbdex-junit-results.zip")
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

@@ -125,7 +125,7 @@ func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 			slog.Info("regex success for suite", "sdk", s.Name, "before", suite.Name, "after", suiteName)
 		}
 
-		if knownVectors[suiteName] == nil {
+		if vectorsToUse[suiteName] == nil {
 			slog.Info("ignoring test suite that does not correspond to known feature", "suite", suiteName)
 			continue
 		}
@@ -138,11 +138,11 @@ func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 					slog.Info("test did not match feature regex for sdk, skipping", "sdk", s.Name, "suite", suiteName, "test", test.Name, "matches", matches)
 					continue
 				}
-				testName = matches[1]
+				testName = matches[len(matches)-1]
 				slog.Info("regex success for test", "sdk", s.Name, "before", test.Name, "after", testName)
 			}
 
-			if !knownVectors[suiteName][testName] {
+			if !vectorsToUse[suiteName][testName] {
 				slog.Info("ignoring test that does not correspond to known vector", "suite", suiteName, "test", testName)
 				continue
 			}

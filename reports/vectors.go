@@ -82,6 +82,7 @@ func parseTbdexVectorPath(path string) (feature string, vector string) {
 	// Assuming the 'vector' is always the last part of the path
 	vector = pathParts[len(pathParts)-1]
 	vector = strings.TrimSuffix(vector, ".json")
+	vector = strings.Replace(vector, "-", "_", -1)
 
 	// Assuming the 'feature' is always the second last part of the path
 	if len(pathParts) >= 3 {
