@@ -24,7 +24,7 @@ jobs:
           path: tbdex
       - name: Copy web5-spec test-vectors
         run: cp -r web5-spec/test-vectors ./test-vectors
-      - name: Copy tbdex test-vectors
+      - name: Copy tbdex hosted test-vectors
         run: cp -r tbdex/hosted/test-vectors ./tbdex-test-vectors
       - name: build html
         run: |
