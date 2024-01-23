@@ -37,13 +37,13 @@ func WriteHTML(reports []Report, filename string) error {
 				}
 			}
 
-			//for test := range tests {
-			//	if report.SDK.Type == "tbdex" {
-			//		testmap[category][test] = true
-			//	} else {
-			//		tbdexTestMap[category][test] = true
-			//	}
-			//}
+			for test := range tests {
+				if report.SDK.Type == "web5" {
+					testmap[category][test] = true
+				} else {
+					tbdexTestMap[category][test] = true
+				}
+			}
 		}
 	}
 
