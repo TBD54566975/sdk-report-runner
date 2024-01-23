@@ -17,6 +17,7 @@ jobs:
         with:
           repository: TBD54566975/web5-spec
           path: web5-spec
+      - name: Checkout tbdex repo
         uses: actions/checkout@v3
         with:
           repository: TBD54566975/tbdex
