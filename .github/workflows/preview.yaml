@@ -22,12 +22,10 @@ jobs:
         with:
           repository: TBD54566975/tbdex
           path: tbdex
-      - name: Prepare test-vectors directory
-        run: mkdir -p ./test-vectors
       - name: Copy web5-spec test-vectors
-        run: cp -r web5-spec/test-vectors/* ./test-vectors/
+        run: cp -r web5-spec/test-vectors ./test-vectors
       - name: Copy tbdex hosted test-vectors
-        run: cp -r tbdex/hosted/test-vectors/* ./test-vectors/
+        run: cp -r tbdex/hosted/test-vectors ./tbdex-test-vectors
       - name: build html
         run: |
           cd reports

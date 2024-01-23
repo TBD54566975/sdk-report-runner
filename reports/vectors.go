@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-var knownVectors = readKnownVectors()
+var knownVectors = readKnownVectors("../test-vectors")
+var tbdexKnownVectors = readKnownVectors("../tbdex-test-vectors")
 
-func readKnownVectors() map[string]map[string]bool {
+func readKnownVectors(dir string) map[string]map[string]bool {
 	knownVectors := make(map[string]map[string]bool)
-	dir := "../test-vectors"
 	err := filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if !strings.HasSuffix(path, ".json") || strings.HasSuffix(path, ".schema.json") {
 			return nil

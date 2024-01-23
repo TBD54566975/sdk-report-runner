@@ -21,7 +21,7 @@
         <thead>
           <tr>
             <th scope="col">test vector</th>
-            {{ range $.Reports }}
+            {{ range $.Web5Reports }}
             <th scope="col">
               <a target="_blank" href="https://github.com/{{ .SDK.Repo }}"
                 >{{ .SDK.Name }}</a
@@ -34,7 +34,7 @@
           {{ range $i, $test := $tests }}
           <tr>
             <th scope="row">{{ $test }}</th>
-            {{ range $_, $report := $.Reports }}
+            {{ range $_, $report := $.Web5Reports }}
             <td>
               <details{{ if eq (len (index (index .Results $category) $test).Errors) 0 }} tabindex="-1"{{ end }}>
                 <summary{{ if eq (len (index (index .Results $category) $test).Errors) 0 }} role="paragraph"{{ end }}>
@@ -66,7 +66,7 @@
         <thead>
         <tr>
           <th scope="col">test vector</th>
-          {{ range $.Reports }}
+          {{ range $.TbdexReports }}
           <th scope="col">
             <a target="_blank" href="https://github.com/{{ .SDK.Repo }}"
             >{{ .SDK.Name }}</a
@@ -79,7 +79,7 @@
         {{ range $i, $test := $tests }}
         <tr>
           <th scope="row">{{ $test }}</th>
-          {{ range $_, $report := $.Reports }}
+          {{ range $_, $report := $.TbdexReports }}
           <td>
             <details{{ if eq (len (index (index .Results $category) $test).Errors) 0 }} tabindex="-1"{{ end }}>
             <summary{{ if eq (len (index (index .Results $category) $test).Errors) 0 }} role="paragraph"{{ end }}>

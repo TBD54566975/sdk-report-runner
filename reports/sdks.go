@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -58,6 +59,7 @@ func GetAllReports() ([]Report, error) {
 	var reports []Report
 	for _, sdk := range SDKs {
 		artifact, err := downloadArtifact(ctx, sdk)
+		//artifact, err := downloadLocal(ctx, sdk)
 		if err != nil {
 			return nil, fmt.Errorf("error downloading artifact from %s: %v", sdk.Repo, err)
 		}
@@ -67,14 +69,12 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
-
 		// DEBUG
 		fmt.Println("~~~SUITES:~~~")
 		for _, suite := range suites {
 			fmt.Println(suite.Name)
 			fmt.Println(suite.Totals.Passed)
 		}
-	
 
 		report, err := sdk.buildReport(suites)
 		if err != nil {
@@ -83,7 +83,7 @@ func GetAllReports() ([]Report, error) {
 
 		// DEBUG
 		fmt.Println("~~~REPORT RESULT:~~~")
-		for _, result := range report.Results{
+		for _, result := range report.Results {
 			fmt.Println(result)
 		}
 
@@ -91,6 +91,15 @@ func GetAllReports() ([]Report, error) {
 	}
 
 	return reports, nil
+}
+
+func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
+	data, err := os.ReadFile("../results.zip")
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {

@@ -17,9 +17,11 @@ func sanatizeHTML(dirty error) string {
 }
 
 type htmlTemplateInput struct {
-	Reports    []Report
-	Web5Tests  map[string][]string
-	TbDEXTests map[string][]string
+	Reports      []Report
+	Web5Reports  []Report
+	TbdexReports []Report
+	Web5Tests    map[string][]string
+	TbDEXTests   map[string][]string
 }
 
 func WriteHTML(reports []Report, filename string) error {
@@ -47,10 +49,26 @@ func WriteHTML(reports []Report, filename string) error {
 		}
 	}
 
+	var web5Reports []Report
+	for _, report := range reports {
+		if report.SDK.Type == "web5" {
+			web5Reports = append(web5Reports, report)
+		}
+	}
+
+	var tbdexReports []Report
+	for _, report := range reports {
+		if report.SDK.Type == "tbdex" {
+			tbdexReports = append(tbdexReports, report)
+		}
+	}
+
 	templateInput := htmlTemplateInput{
-		Reports:    reports,
-		Web5Tests:  make(map[string][]string),
-		TbDEXTests: make(map[string][]string),
+		Reports:      reports,
+		Web5Reports:  web5Reports,
+		TbdexReports: tbdexReports,
+		Web5Tests:    make(map[string][]string),
+		TbDEXTests:   make(map[string][]string),
 	}
 
 	for category, tests := range testmap {
