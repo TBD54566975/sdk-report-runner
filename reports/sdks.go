@@ -82,10 +82,9 @@ func GetAllReports() ([]Report, error) {
 		}
 
 		// DEBUG
-		fmt.Println("~~~REPORT:~~~")
-		for _, r := range report {
-			fmt.Println(suite.Name)
-			fmt.Println(suite.Totals.Passed)
+		fmt.Println("~~~REPORT RESULT:~~~")
+		for _, result := range report.Results{
+			fmt.Println(result)
 		}
 
 		reports = append(reports, report)
