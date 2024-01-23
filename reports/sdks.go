@@ -67,9 +67,25 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
+
+		// DEBUG
+		fmt.Println("~~~SUITES:~~~")
+		for _, suite := range suites {
+			fmt.Println(suite.Name)
+			fmt.Println(suite.Totals.Passed)
+		}
+	
+
 		report, err := sdk.buildReport(suites)
 		if err != nil {
 			return nil, fmt.Errorf("error processing data from %s: %v", sdk.Repo, err)
+		}
+
+		// DEBUG
+		fmt.Println("~~~REPORT:~~~")
+		for _, r := range report {
+			fmt.Println(suite.Name)
+			fmt.Println(suite.Totals.Passed)
 		}
 
 		reports = append(reports, report)
