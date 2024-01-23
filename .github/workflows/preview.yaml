@@ -17,8 +17,14 @@ jobs:
         with:
           repository: TBD54566975/web5-spec
           path: web5-spec
-      - name: Copy test-vectors
-        run: cp -r web5-spec/test-vectors .
+        uses: actions/checkout@v3
+        with:
+          repository: TBD54566975/tbdex
+          path: tbdex
+      - name: Copy web5-spec test-vectors
+        run: cp -r web5-spec/test-vectors ./test-vectors
+      - name: Copy tbdex test-vectors
+        run: cp -r tbdex/hosted/test-vectors ./tbdex-test-vectors
       - name: build html
         run: |
           cd reports
@@ -34,7 +40,7 @@ jobs:
         if: github.event.action != 'closed'
       - uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: .
+          source-dir: ./_site
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto
