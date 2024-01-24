@@ -1,4 +1,4 @@
-name: build html report
+name: Build Html Report
 
 on:
   push:
@@ -23,8 +23,10 @@ jobs:
         with:
           repository: TBD54566975/tbdex
           path: tbdex
-      - name: Copy test-vectors
-        run: cp -r web5-spec/test-vectors .
+      - name: Copy web5-spec test-vectors
+        run: cp -r web5-spec/test-vectors ./test-vectors
+      - name: Copy tbdex hosted test-vectors
+        run: cp -r tbdex/hosted/test-vectors ./tbdex-test-vectors
       - uses: actions/setup-go@v4
       - name: build html
         run: |
