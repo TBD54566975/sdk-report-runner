@@ -6,17 +6,34 @@ import (
 	"strings"
 )
 
-var knownVectors = readKnownVectors("../test-vectors")
-var tbdexKnownVectors = readKnownTbdexVectors("../tbdex-test-vectors")
+func getKnownVectors(vectorType string) map[string]map[string]bool {
+	if vectorType == "web5" {
+		return readKnownVectors("../test-vectors")
+	} else if vectorType == "tbdex" {
+		return readKnownVectors("../tbdex-test-vectors")
+	}
+	return nil
+}
 
 func readKnownVectors(dir string) map[string]map[string]bool {
 	knownVectors := make(map[string]map[string]bool)
 	err := filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
+
+		if strings.HasSuffix(path, "package-lock.json") || strings.HasSuffix(path, "package.json") {
+			return nil
+		}
+
 		if !strings.HasSuffix(path, ".json") || strings.HasSuffix(path, ".schema.json") {
 			return nil
 		}
 
-		feature, vector := parseVectorPath(strings.TrimPrefix(path, dir))
+		var feature, vector string
+		if strings.Contains(dir, "tbdex") {
+			feature, vector = parseTbdexVectorPath(strings.TrimPrefix(path, dir))
+		} else {
+			feature, vector = parseVectorPath(strings.TrimPrefix(path, dir))
+		}
+
 		if knownVectors[feature] == nil {
 			knownVectors[feature] = make(map[string]bool)
 		}
@@ -45,34 +62,6 @@ func parseVectorPath(path string) (feature string, vector string) {
 	feature = strings.Join(featureWords, "")
 
 	return feature, vector
-}
-
-func readKnownTbdexVectors(dir string) map[string]map[string]bool {
-	knownVectors := make(map[string]map[string]bool)
-	err := filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
-
-		if strings.HasSuffix(path, "package-lock.json") || strings.HasSuffix(path, "package.json") {
-			return nil
-		}
-
-		if !strings.HasSuffix(path, ".json") || strings.HasSuffix(path, ".schema.json") {
-			return nil
-		}
-
-		feature, vector := parseTbdexVectorPath(strings.TrimPrefix(path, dir))
-		if knownVectors[feature] == nil {
-			knownVectors[feature] = make(map[string]bool)
-		}
-		knownVectors[feature][vector] = true
-
-		return nil
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	return knownVectors
 }
 
 func parseTbdexVectorPath(path string) (feature string, vector string) {

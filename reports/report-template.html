@@ -9,8 +9,9 @@
   </head>
   <body>
     <main>
+      <hr/>
       <h1>Web5 Spec Compliance Report</h1>
-
+      <hr/>
       {{ range $category, $tests := .Web5Tests }}
       <h2 id="{{ $category }}_table-caption">{{ $category }}</h2>
       <table aria-labelledby="{{ $category }}_table-caption">
@@ -54,7 +55,9 @@
       </table>
       {{ end }}
 
+      <hr/>
       <h1>Tbdex Spec Compliance Report</h1>
+      <hr/>
 
       {{ range $category, $tests := .TbDEXTests }}
       <h2 id="{{ $category }}_table-caption">{{ $category }}</h2>

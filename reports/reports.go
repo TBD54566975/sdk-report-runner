@@ -98,13 +98,7 @@ func (r Result) GetEmojiAriaLabel() string {
 
 func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 	results := make(map[string]map[string]Result)
-
-	vectorsToUse := make(map[string]map[string]bool)
-	if s.Type == "web5" {
-		vectorsToUse = knownVectors
-	} else if s.Type == "tbdex" {
-		vectorsToUse = tbdexKnownVectors
-	}
+	vectorsToUse := getKnownVectors(s.Type)
 
 	for feature, vectors := range vectorsToUse {
 		results[feature] = make(map[string]Result)

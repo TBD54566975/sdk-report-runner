@@ -130,8 +130,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
-	//data, err := os.ReadFile("../results.zip")
-	data, err := os.ReadFile("../tbdex-junit-results.zip")
+	data, err := os.ReadFile("../results.zip")
+	//data, err := os.ReadFile("../tbdex-junit-results.zip")
 	if err != nil {
 		return nil, err
 	}
