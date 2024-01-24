@@ -1,0 +1,47 @@
+name: Deploy PR Previews
+concurrency: preview-${{ github.ref }}
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout web5-spec repo
+        uses: actions/checkout@v3
+        with:
+          repository: TBD54566975/web5-spec
+          path: web5-spec
+      - name: Checkout tbdex repo
+        uses: actions/checkout@v3
+        with:
+          repository: TBD54566975/tbdex
+          path: tbdex
+      - name: Copy web5-spec test-vectors
+        run: cp -r web5-spec/test-vectors ./test-vectors
+      - name: Copy tbdex hosted test-vectors
+        run: cp -r tbdex/hosted/test-vectors ./tbdex-test-vectors
+      - name: build html
+        run: |
+          cd reports
+          go run ./cmd/build-html
+          cp -r ./static/* _site
+          mv _site ../
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CICD_ROBOT_GITHUB_APP_NAME: ${{ secrets.CICD_ROBOT_GITHUB_APP_NAME }}
+          CICD_ROBOT_GITHUB_APP_PRIVATE_KEY: ${{ secrets.CICD_ROBOT_GITHUB_APP_PRIVATE_KEY }}
+          CICD_ROBOT_GITHUB_APP_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_ID }}
+          CICD_ROBOT_GITHUB_APP_INSTALLATION_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_INSTALLATION_ID }}
+        if: github.event.action != 'closed'
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./_site
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto
