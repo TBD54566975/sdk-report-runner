@@ -1,16 +1,13 @@
-name: Build Html Report
-
+name: Build and Deploy
 on:
   push:
   workflow_dispatch:
-
+permissions:
+  contents: write
 jobs:
-  build-report:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      pages: write
     steps:
       - uses: actions/checkout@v3
       - name: Checkout web5-spec repo
@@ -40,7 +37,7 @@ jobs:
           CICD_ROBOT_GITHUB_APP_PRIVATE_KEY: ${{ secrets.CICD_ROBOT_GITHUB_APP_PRIVATE_KEY }}
           CICD_ROBOT_GITHUB_APP_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_ID }}
           CICD_ROBOT_GITHUB_APP_INSTALLATION_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_INSTALLATION_ID }}
-      - uses: actions/upload-pages-artifact@v2
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
