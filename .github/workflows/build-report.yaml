@@ -41,6 +41,7 @@ jobs:
           CICD_ROBOT_GITHUB_APP_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_ID }}
           CICD_ROBOT_GITHUB_APP_INSTALLATION_ID: ${{ secrets.CICD_ROBOT_GITHUB_APP_INSTALLATION_ID }}
       - uses: actions/upload-pages-artifact@v2
-      - name: deploy GitHub Pages
-        uses: actions/deploy-pages@v3
-        if: github.ref == 'refs/heads/main'
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site # The folder the action should deploy.
