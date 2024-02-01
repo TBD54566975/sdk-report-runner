@@ -35,9 +35,10 @@ var (
 		{
 			Name:         "web5-swift",
 			Repo:         "TBD54566975/web5-swift",
-			ArtifactName: "tests",
+			ArtifactName: "test-results",
 			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`test_(\w+)`),
+			VectorPath:   "test-vectors",
 			Type:         "web5",
 		},
 		{
