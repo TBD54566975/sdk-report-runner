@@ -27,7 +27,7 @@ var (
 			Name:         "web5-kt",
 			Repo:         "TBD54566975/web5-kt",
 			ArtifactName: "test-results",
-			FeatureRegex: regexp.MustCompile(`web5\.sdk\.\w+.Web5TestVectors(\w+)`),
+			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
 			VectorPath:   "test-vectors",
 			Type:         "web5",
