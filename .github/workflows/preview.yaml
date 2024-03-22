@@ -29,6 +29,7 @@ jobs:
       - name: build html
         run: |
           cd reports
+          sudo apt-get install -yyq fonts-arkpandora # needed to generate badges
           go run ./cmd/build-html
           cp -r ./static/* _site
           mv _site ../

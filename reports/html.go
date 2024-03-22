@@ -3,6 +3,7 @@ package reports
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/exp/slog"
@@ -24,12 +25,14 @@ type htmlTemplateInput struct {
 	TbDEXTests   map[string][]string
 }
 
-func WriteHTML(reports []Report, filename string) error {
+func WriteHTML(reports []Report, destinationDir string) error {
 	slog.Info("writing html report", "reports", len(reports))
 
 	testmap := make(map[string]map[string]bool)
 	tbdexTestMap := make(map[string]map[string]bool)
 	for _, report := range reports {
+		badge := Badge{Name: report.SDK.Name}
+		slog.Info("debug", "result_count", len(report.Results))
 		for category, tests := range report.Results {
 			if _, ok := tests[category]; !ok {
 				if report.SDK.Type == "web5" {
@@ -39,13 +42,27 @@ func WriteHTML(reports []Report, filename string) error {
 				}
 			}
 
+			badge.Total += len(tests)
+
 			for test := range tests {
 				if report.SDK.Type == "web5" {
 					testmap[category][test] = true
 				} else {
 					tbdexTestMap[category][test] = true
 				}
+
+				if tests[test].Exists {
+					if len(tests[test].Errors) > 0 {
+						badge.Error = true
+					} else {
+						badge.Passing += 1
+					}
+				}
 			}
+		}
+
+		if err := badge.Render(destinationDir); err != nil {
+			return fmt.Errorf("error generating badge: %v", err)
 		}
 	}
 
@@ -83,9 +100,11 @@ func WriteHTML(reports []Report, filename string) error {
 		}
 	}
 
-	f, err := os.Create(filename)
+	indexFilename := filepath.Join(destinationDir, "index.html")
+	slog.Info("writing index.html", "file", indexFilename)
+	f, err := os.Create(indexFilename)
 	if err != nil {
-		return fmt.Errorf("error opening %s: %v", filename, err)
+		return fmt.Errorf("error opening %s: %v", indexFilename, err)
 	}
 	defer f.Close()
 
