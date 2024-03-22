@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"os"
-	"path/filepath"
 
 	"golang.org/x/exp/slog"
 
@@ -22,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	err = reports.WriteHTML(allReports, filepath.Join("_site", "index.html"))
+	err = reports.WriteHTML(allReports, "_site")
 	if err != nil {
 		slog.Error("error writing html output")
 		panic(err)
