@@ -82,7 +82,6 @@ func GetAllReports() ([]Report, error) {
 
 		var web5TestVectorSuites []junit.Suite
 
-		// Determine the search string based on sdk.Type
 		var searchString string
 		if sdk.Type == "web5" {
 			searchString = "Web5TestVector"

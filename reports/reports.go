@@ -135,7 +135,7 @@ func extractFeature(input string, featureRegex *regexp.Regexp) string {
 	matches := featureRegex.FindStringSubmatch(input)
 	// If a match is found, it will be in the second element of the 'matches' slice.
 	if len(matches) >= 2 {
-		return matches[1] // Return the captured group, which is the part of interest.
+		return matches[1]
 	}
 
 	return ""
@@ -145,6 +145,7 @@ func extractTestName(input string, testRegex *regexp.Regexp) string {
 	matches := testRegex.FindStringSubmatch(input)
 
 	if len(matches) > 0 {
+		// If a match is found, it will be in the last element.
 		return matches[len(matches)-1]
 	}
 
