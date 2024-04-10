@@ -61,7 +61,6 @@ func (r Report) IsPassing() bool {
 				return false
 			}
 		}
-
 	}
 
 	return true

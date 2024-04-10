@@ -80,21 +80,29 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
-		var web5TestVectorSuites []junit.Suite // Replace 'SuiteType' with the actual type of your suites
+		var web5TestVectorSuites []junit.Suite
+
+		// Determine the search string based on sdk.Type
+		var searchString string
+		if sdk.Type == "web5" {
+			searchString = "Web5TestVector"
+		} else if sdk.Type == "tbdex" {
+			searchString = "TbdexTestVector"
+		}
 
 		for _, suite := range suites {
-			if strings.Contains(suite.Name, "Web5TestVector") {
+			if strings.Contains(suite.Name, searchString) {
 				web5TestVectorSuites = append(web5TestVectorSuites, suite)
 			}
 		}
 
 		if len(web5TestVectorSuites) > 0 {
-			fmt.Println("Found these Web5TestVectorSuites:")
+			fmt.Println("Found these Test Vector Suites:")
 			for _, suite := range web5TestVectorSuites {
 				fmt.Println("-", suite.Name)
 			}
 		} else {
-			fmt.Println("No Web5TestVectorSuites found.")
+			fmt.Println("No Test Vector Suites found.")
 		}
 
 		report, err := sdk.buildReport(web5TestVectorSuites)
@@ -158,7 +166,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
-	data, err := os.ReadFile("../junit-results.zip")
+	data, err := os.ReadFile("../tbdex-junit-results.zip")
+	//data, err := os.ReadFile("../junit-results.zip")
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
 	//data, err := os.ReadFile("../tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
