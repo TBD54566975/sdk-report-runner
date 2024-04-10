@@ -26,7 +26,7 @@ var (
 		{
 			Name:         "web5-kt",
 			Repo:         "TBD54566975/web5-kt",
-			ArtifactName: "test-results-juint",
+			ArtifactName: "tests-report-junit",
 			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
 			VectorPath:   "test-vectors",
@@ -126,7 +126,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 		}
 		if *a.Name == sdk.ArtifactName {
 			artifactURL = *a.ArchiveDownloadURL
-			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA())
+			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
 			break
 		}
 	}
