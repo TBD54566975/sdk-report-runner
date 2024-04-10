@@ -8,7 +8,6 @@ import (
 	"time"
 
 	junit "github.com/joshdk/go-junit"
-	"golang.org/x/exp/slog"
 )
 
 var (
@@ -95,7 +94,6 @@ func (r Result) GetEmojiAriaLabel() string {
 
 	return "Failed"
 }
-
 func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 	results := make(map[string]map[string]Result)
 	vectorsToUse := getKnownVectors(s.Type)
@@ -108,48 +106,22 @@ func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 	}
 
 	for _, suite := range suites {
-		suiteName := suite.Name
-		if s.FeatureRegex != nil {
-			matches := s.FeatureRegex.FindStringSubmatch(suite.Name)
-			if len(matches) < 2 {
-				slog.Info("suite did not match feature regex for sdk, skipping", "sdk", s.Name, "suite", suite.Name, "matches", matches)
-				continue
-			}
-			suiteName = matches[1]
-			slog.Info("regex success for suite", "sdk", s.Name, "before", suite.Name, "after", suiteName)
-		}
-
-		if vectorsToUse[suiteName] == nil {
-			slog.Info("ignoring test suite that does not correspond to known feature", "suite", suiteName)
-			continue
-		}
+		feature := extractFeature(suite.Name, s.FeatureRegex)
 
 		for _, test := range suite.Tests {
-			testName := test.Name
-			if s.VectorRegex != nil {
-				matches := s.VectorRegex.FindStringSubmatch(test.Name)
-				if len(matches) < 2 {
-					slog.Info("test did not match feature regex for sdk, skipping", "sdk", s.Name, "suite", suiteName, "test", test.Name, "matches", matches)
-					continue
-				}
-				testName = matches[len(matches)-1]
-				slog.Info("regex success for test", "sdk", s.Name, "before", test.Name, "after", testName)
-			}
-
-			if !vectorsToUse[suiteName][testName] {
-				slog.Info("ignoring test that does not correspond to known vector", "suite", suiteName, "test", testName)
-				continue
-			}
+			vector := extractTestName(test.Name, s.VectorRegex)
 
 			errs := []error{}
 			if test.Error != nil {
 				errs = append(errs, test.Error)
 			}
 
-			results[suiteName][testName] = Result{
-				Exists: true,
-				Errors: errs,
-				Time:   test.Duration,
+			if vectorsToUse[feature][vector] {
+				results[feature][vector] = Result{
+					Exists: true,
+					Errors: errs,
+					Time:   test.Duration,
+				}
 			}
 		}
 	}
@@ -158,4 +130,24 @@ func (s SDKMeta) buildReport(suites []junit.Suite) (Report, error) {
 		SDK:     s,
 		Results: results,
 	}, nil
+}
+
+func extractFeature(input string, featureRegex *regexp.Regexp) string {
+	matches := featureRegex.FindStringSubmatch(input)
+	// If a match is found, it will be in the second element of the 'matches' slice.
+	if len(matches) >= 2 {
+		return matches[1] // Return the captured group, which is the part of interest.
+	}
+
+	return ""
+}
+
+func extractTestName(input string, testRegex *regexp.Regexp) string {
+	matches := testRegex.FindStringSubmatch(input)
+
+	if len(matches) > 0 {
+		return matches[len(matches)-1]
+	}
+
+	return ""
 }

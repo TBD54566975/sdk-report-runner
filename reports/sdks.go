@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/joshdk/go-junit"
 	"golang.org/x/exp/slog"
 )
 
@@ -53,7 +54,7 @@ var (
 		{
 			Name:         "tbdex-kt",
 			Repo:         "TBD54566975/tbdex-kt",
-			ArtifactName: "test-results",
+			ArtifactName: "tests-report-junit",
 			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
 			VectorPath:   "tbdex-test-vectors",
@@ -67,6 +68,7 @@ func GetAllReports() ([]Report, error) {
 
 	var reports []Report
 	for _, sdk := range SDKs {
+		slog.Info("Processing: " + sdk.Name)
 		artifact, err := downloadArtifact(ctx, sdk)
 		//artifact, err := downloadLocal(ctx, sdk)
 		if err != nil {
@@ -78,30 +80,24 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
-		slog.Info("~~~suites:")
-		slog.Info(sdk.Name)
+		var web5TestVectorSuites []junit.Suite // Replace 'SuiteType' with the actual type of your suites
 
 		for _, suite := range suites {
-
 			if strings.Contains(suite.Name, "Web5TestVector") {
-				slog.Info("name: " + suite.Name)
-				slog.Info("package: " + suite.Package)
-
-				for _, testz := range suite.Tests {
-					slog.Info("test name internal: " + testz.Name)
-				}
-
-				for _, suiteinternal := range suite.Suites {
-					slog.Info("suite name internal: " + suiteinternal.Name)
-					//slog.Info("suite name internal: " + suiteinternal.)
-				}
-				//slog.Info("test0: " + suite.Tests[0].Name)
-				//slog.Info("suites0: " + suite.Suites[0].Name)
-				//slog.Info("suites0: " + suite.Suites[0].Suites[0])
+				web5TestVectorSuites = append(web5TestVectorSuites, suite)
 			}
 		}
 
-		report, err := sdk.buildReport(suites)
+		if len(web5TestVectorSuites) > 0 {
+			fmt.Println("Found these Web5TestVectorSuites:")
+			for _, suite := range web5TestVectorSuites {
+				fmt.Println("-", suite.Name)
+			}
+		} else {
+			fmt.Println("No Web5TestVectorSuites found.")
+		}
+
+		report, err := sdk.buildReport(web5TestVectorSuites)
 		if err != nil {
 			return nil, fmt.Errorf("error processing data from %s: %v", sdk.Repo, err)
 		}
@@ -162,8 +158,10 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
-	data, err := os.ReadFile("../results.zip")
+	data, err := os.ReadFile("../junit-results.zip")
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
+	//data, err := os.ReadFile("../tests-report-junit.zip")
+	//data, err := os.ReadFile("../junit-results-js-custom.zip")
 	if err != nil {
 		return nil, err
 	}
