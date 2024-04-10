@@ -89,7 +89,6 @@ func GetAllReports() ([]Report, error) {
 
 				for _, testz := range suite.Tests {
 					slog.Info("test name internal: " + testz.Name)
-					if(if)
 				}
 
 				for _, suiteinternal := range suite.Suites {
