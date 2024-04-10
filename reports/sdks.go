@@ -26,7 +26,7 @@ var (
 		{
 			Name:         "web5-kt",
 			Repo:         "TBD54566975/web5-kt",
-			ArtifactName: "test-results",
+			ArtifactName: "test-results-juint",
 			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
 			VectorPath:   "test-vectors",
@@ -82,20 +82,22 @@ func GetAllReports() ([]Report, error) {
 
 		for _, suite := range suites {
 
-			slog.Info("name: " + suite.Name)
-			slog.Info("package: " + suite.Package)
+			if strings.Contains(suite.Name, "Web5TestVector") {
+				slog.Info("name: " + suite.Name)
+				slog.Info("package: " + suite.Package)
 
-			for _, testz := range suite.Tests {
-				slog.Info("test name internal: " + testz.Name)
-			}
+				for _, testz := range suite.Tests {
+					slog.Info("test name internal: " + testz.Name)
+				}
 
-			for _, suiteinternal := range suite.Suites {
-				slog.Info("suite name internal: " + suiteinternal.Name)
-				//slog.Info("suite name internal: " + suiteinternal.)
+				for _, suiteinternal := range suite.Suites {
+					slog.Info("suite name internal: " + suiteinternal.Name)
+					//slog.Info("suite name internal: " + suiteinternal.)
+				}
+				//slog.Info("test0: " + suite.Tests[0].Name)
+				//slog.Info("suites0: " + suite.Suites[0].Name)
+				//slog.Info("suites0: " + suite.Suites[0].Suites[0])
 			}
-			//slog.Info("test0: " + suite.Tests[0].Name)
-			//slog.Info("suites0: " + suite.Suites[0].Name)
-			//slog.Info("suites0: " + suite.Suites[0].Suites[0])
 		}
 
 		report, err := sdk.buildReport(suites)
