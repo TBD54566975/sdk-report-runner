@@ -78,6 +78,26 @@ func GetAllReports() ([]Report, error) {
 			return nil, fmt.Errorf("error parsing artifact from %s: %v", sdk.Repo, err)
 		}
 
+		slog.Info("~~~suites:")
+
+		for _, suite := range suites {
+
+			slog.Info("name: " + suite.Name)
+			slog.Info("package: " + suite.Package)
+
+			for _, testz := range suite.Tests {
+				slog.Info("test name internal: " + testz.Name)
+			}
+
+			for _, suiteinternal := range suite.Suites {
+				slog.Info("suite name internal: " + suiteinternal.Name)
+				//slog.Info("suite name internal: " + suiteinternal.)
+			}
+			//slog.Info("test0: " + suite.Tests[0].Name)
+			//slog.Info("suites0: " + suite.Suites[0].Name)
+			//slog.Info("suites0: " + suite.Suites[0].Suites[0])
+		}
+
 		report, err := sdk.buildReport(suites)
 		if err != nil {
 			return nil, fmt.Errorf("error processing data from %s: %v", sdk.Repo, err)
