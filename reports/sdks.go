@@ -28,7 +28,7 @@ var (
 			Repo:         "TBD54566975/web5-kt",
 			ArtifactName: "tests-report-junit",
 			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
+			VectorRegex:  regexp.MustCompile(`^.+$`),
 			VectorPath:   "test-vectors",
 			Type:         "web5",
 		},
@@ -79,6 +79,7 @@ func GetAllReports() ([]Report, error) {
 		}
 
 		slog.Info("~~~suites:")
+		slog.Info(sdk.Name)
 
 		for _, suite := range suites {
 
@@ -88,6 +89,7 @@ func GetAllReports() ([]Report, error) {
 
 				for _, testz := range suite.Tests {
 					slog.Info("test name internal: " + testz.Name)
+					if(if)
 				}
 
 				for _, suiteinternal := range suite.Suites {
