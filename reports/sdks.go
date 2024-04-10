@@ -56,7 +56,7 @@ var (
 			Repo:         "TBD54566975/tbdex-kt",
 			ArtifactName: "tests-report-junit",
 			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`(\w+)\(\)`),
+			VectorRegex:  regexp.MustCompile(`(\w+)`),
 			VectorPath:   "tbdex-test-vectors",
 			Type:         "tbdex",
 		},
@@ -166,7 +166,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
-	data, err := os.ReadFile("../tbdex-junit-results.zip")
+	//data, err := os.ReadFile("../tbdex-junit-results.zip")
+	data, err := os.ReadFile("../tbdex-kt-tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results.zip")
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
 	//data, err := os.ReadFile("../tests-report-junit.zip")
