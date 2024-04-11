@@ -73,7 +73,7 @@ func GetAllReports() ([]Report, error) {
 		//artifact, err := downloadLocal(ctx, sdk)
 		if err != nil {
 			//return nil, fmt.Errorf("error downloading artifact from %s: %v", sdk.Repo, err)
-			fmt.Errorf("error downloading artifact from %s: %v. continuing...", sdk.Repo, err)
+			slog.Error(fmt.Sprintf("error downloading artifact from %s: %v. continuing..", sdk.Repo, err))
 			continue
 		}
 
