@@ -128,6 +128,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 		if a.GetWorkflowRun().GetHeadBranch() != "main" {
 			continue
 		}
+
+		slog.Info("artifact found: " + *a.Name + " at: " + *a.ArchiveDownloadURL)
 		if *a.Name == sdk.ArtifactName {
 			artifactURL = *a.ArchiveDownloadURL
 			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
