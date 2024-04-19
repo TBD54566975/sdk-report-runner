@@ -72,7 +72,8 @@ func GetAllReports() ([]Report, error) {
 		artifact, err := downloadArtifact(ctx, sdk)
 		//artifact, err := downloadLocal(ctx, sdk)
 		if err != nil {
-			return nil, fmt.Errorf("error downloading artifact from %s: %v", sdk.Repo, err)
+			slog.Error(fmt.Sprintf("error downloading artifact from %s: %v. continuing..", sdk.Repo, err))
+			continue
 		}
 
 		suites, err := readArtifactZip(artifact)
@@ -128,6 +129,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 		if a.GetWorkflowRun().GetHeadBranch() != "main" {
 			continue
 		}
+
+		slog.Info("artifact found: " + *a.Name + " at: " + *a.ArchiveDownloadURL)
 		if *a.Name == sdk.ArtifactName {
 			artifactURL = *a.ArchiveDownloadURL
 			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
