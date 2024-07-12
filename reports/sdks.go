@@ -60,6 +60,24 @@ var (
 			VectorPath:   "tbdex-test-vectors",
 			Type:         "tbdex",
 		},
+		{
+			Name:         "tbdex-core-kt",
+			Repo:         "TBD54566975/tbdex-rs",
+			ArtifactName: "kotlin-test-results",
+			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
+			VectorRegex:  regexp.MustCompile(`(\w+)`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
+		{
+			Name:         "tbdex-rs",
+			Repo:         "TBD54566975/tbdex-rs",
+			ArtifactName: "rust-test-results",
+			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
+			VectorRegex:  regexp.MustCompile(`::(\w+)$`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
 	}
 )
 
@@ -169,11 +187,13 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
-	data, err := os.ReadFile("../tbdex-kt-tests-report-junit.zip")
+	//data, err := os.ReadFile("../tbdex-kt-tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results.zip")
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
 	//data, err := os.ReadFile("../tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
+	//data, err := os.ReadFile("../kotlin-test-results.zip")
+	data, err := os.ReadFile("../rust-test-results.zip")
 	if err != nil {
 		return nil, err
 	}
