@@ -136,10 +136,17 @@ func GetAllReports() ([]Report, error) {
 
 func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	owner, repo, _ := strings.Cut(sdk.Repo, "/")
+
+	slog.Info("~~Downloading artifact from ", owner+"/"+repo)
+
 	artifacts, _, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
 	if err != nil {
 		slog.Error("error listing artifacts", "")
 		return nil, fmt.Errorf("error getting artifact list: %v", err)
+	}
+
+	if len(artifacts.Artifacts) == 0 {
+		return nil, fmt.Errorf("~~no artifacts found, throwing error and returning")
 	}
 
 	var artifactURL string
