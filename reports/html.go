@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/exp/slog"
 )
@@ -23,6 +24,7 @@ type htmlTemplateInput struct {
 	TbdexReports []Report
 	Web5Tests    map[string][]string
 	TbDEXTests   map[string][]string
+	CreationTime string
 }
 
 func WriteHTML(reports []Report, destinationDir string) error {
@@ -86,6 +88,7 @@ func WriteHTML(reports []Report, destinationDir string) error {
 		TbdexReports: tbdexReports,
 		Web5Tests:    make(map[string][]string),
 		TbDEXTests:   make(map[string][]string),
+		CreationTime: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	for category, tests := range testmap {

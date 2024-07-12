@@ -60,6 +60,24 @@ var (
 			VectorPath:   "tbdex-test-vectors",
 			Type:         "tbdex",
 		},
+		{
+			Name:         "tbdex-core-kt",
+			Repo:         "TBD54566975/tbdex-rs",
+			ArtifactName: "kotlin-test-results",
+			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
+			VectorRegex:  regexp.MustCompile(`(\w+)`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
+		{
+			Name:         "tbdex-rs",
+			Repo:         "TBD54566975/tbdex-rs",
+			ArtifactName: "rust-test-results",
+			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
+			VectorRegex:  regexp.MustCompile(`::(\w+)$`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
 	}
 )
 
@@ -72,7 +90,8 @@ func GetAllReports() ([]Report, error) {
 		artifact, err := downloadArtifact(ctx, sdk)
 		//artifact, err := downloadLocal(ctx, sdk)
 		if err != nil {
-			return nil, fmt.Errorf("error downloading artifact from %s: %v", sdk.Repo, err)
+			slog.Error(fmt.Sprintf("error downloading artifact from %s: %v. continuing..", sdk.Repo, err))
+			continue
 		}
 
 		suites, err := readArtifactZip(artifact)
@@ -128,6 +147,8 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 		if a.GetWorkflowRun().GetHeadBranch() != "main" {
 			continue
 		}
+
+		slog.Info("artifact found: " + *a.Name + " at: " + *a.ArchiveDownloadURL)
 		if *a.Name == sdk.ArtifactName {
 			artifactURL = *a.ArchiveDownloadURL
 			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
@@ -166,11 +187,13 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 // Used for testing purposes
 func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
-	data, err := os.ReadFile("../tbdex-kt-tests-report-junit.zip")
+	//data, err := os.ReadFile("../tbdex-kt-tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results.zip")
 	//data, err := os.ReadFile("../tbdex-junit-results.zip")
 	//data, err := os.ReadFile("../tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
+	//data, err := os.ReadFile("../kotlin-test-results.zip")
+	data, err := os.ReadFile("../rust-test-results.zip")
 	if err != nil {
 		return nil, err
 	}
