@@ -139,9 +139,11 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 	slog.Info("~~Downloading artifact from ", owner+"/"+repo)
 
-	artifacts, _, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
+	slog.Info("owner:" + owner)
+	slog.Info("repo:" + repo)
+	artifacts, resp, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
 	if err != nil {
-		slog.Error("error listing artifacts", "")
+		slog.Error("Error listing artifacts", "owner", owner, "repo", repo, "response", resp, "error", err)
 		return nil, fmt.Errorf("error getting artifact list: %v", err)
 	}
 
