@@ -151,7 +151,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	slog.Info("owner:" + owner)
 	slog.Info("repo:" + repo)
 	artifacts, respz, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
-	if err != nil {
+	if (err != nil) || (respz.StatusCode != http.StatusOK) {
 		slog.Error("Error listing artifacts", "owner", owner, "repo", repo, "response", respz, "error", err)
 		return nil, fmt.Errorf("error getting artifact list: %v", err)
 	}
@@ -162,6 +162,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 	var artifactURL string
 	for _, a := range artifacts.Artifacts {
+		slog.Info("checking artifact: " + *a.Name + " branch: " + a.GetWorkflowRun().GetHeadBranch())
 		if a.GetWorkflowRun().GetHeadBranch() != "main" {
 			continue
 		}
@@ -172,6 +173,10 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
 			break
 		}
+	}
+
+	if artifactURL == "" {
+		return nil, fmt.Errorf("~~no matching artifact found for %s", sdk.ArtifactName)
 	}
 
 	req, err := http.NewRequest(http.MethodGet, artifactURL, nil)
