@@ -19,7 +19,7 @@
     brightness(100%) contrast(101%);
 
   /* Layout */
-  --layout-max-width: 680px;
+  --layout-max-width: 1200px;
   --table-min-width: 375px;
 }
 

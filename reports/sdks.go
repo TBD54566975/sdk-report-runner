@@ -61,6 +61,15 @@ var (
 			Type:         "tbdex",
 		},
 		{
+			Name:         "tbdex-go",
+			Repo:         "TBD54566975/tbdex-go",
+			ArtifactName: "tests-report-junit",
+			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
+			VectorRegex:  regexp.MustCompile(`TestAllParsers/(\w+)`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
+		{
 			Name:         "tbdex-rs",
 			Repo:         "TBD54566975/tbdex-rs",
 			ArtifactName: "rust-test-results",
@@ -202,7 +211,8 @@ func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	//data, err := os.ReadFile("../tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
 	//data, err := os.ReadFile("../kotlin-test-results.zip")
-	data, err := os.ReadFile("../rust-test-results.zip")
+	//data, err := os.ReadFile("../rust-test-results.zip")
+	data, err := os.ReadFile("../go-test-results.zip")
 	if err != nil {
 		return nil, err
 	}
