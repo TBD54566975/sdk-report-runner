@@ -63,7 +63,7 @@ var (
 		{
 			Name:         "tbdex-go",
 			Repo:         "TBD54566975/tbdex-go",
-			ArtifactName: "tests-report-junit",
+			ArtifactName: "go-test-results",
 			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
 			VectorRegex:  regexp.MustCompile(`TestAllParsers/(\w+)`),
 			VectorPath:   "tbdex-test-vectors",
