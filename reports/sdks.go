@@ -61,6 +61,15 @@ var (
 			Type:         "tbdex",
 		},
 		{
+			Name:         "tbdex-go",
+			Repo:         "TBD54566975/tbdex-go",
+			ArtifactName: "tests-report-junit",
+			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
+			VectorRegex:  regexp.MustCompile(`TestAllParsers/(\w+)`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "tbdex",
+		},
+		{
 			Name:         "tbdex-rs",
 			Repo:         "TBD54566975/tbdex-rs",
 			ArtifactName: "rust-test-results",
@@ -142,7 +151,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	slog.Info("owner:" + owner)
 	slog.Info("repo:" + repo)
 	artifacts, respz, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
-	if err != nil {
+	if (err != nil) || (respz.StatusCode != http.StatusOK) {
 		slog.Error("Error listing artifacts", "owner", owner, "repo", repo, "response", respz, "error", err)
 		return nil, fmt.Errorf("error getting artifact list: %v", err)
 	}
@@ -153,6 +162,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 	var artifactURL string
 	for _, a := range artifacts.Artifacts {
+		slog.Info("checking artifact: " + *a.Name + " branch: " + a.GetWorkflowRun().GetHeadBranch())
 		if a.GetWorkflowRun().GetHeadBranch() != "main" {
 			continue
 		}
@@ -163,6 +173,10 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 			slog.Info("downloading artifact", "repo", sdk.Repo, "commit", a.GetWorkflowRun().GetHeadSHA(), "url", artifactURL)
 			break
 		}
+	}
+
+	if artifactURL == "" {
+		return nil, fmt.Errorf("~~no matching artifact found for %s", sdk.ArtifactName)
 	}
 
 	req, err := http.NewRequest(http.MethodGet, artifactURL, nil)
@@ -202,7 +216,8 @@ func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	//data, err := os.ReadFile("../tests-report-junit.zip")
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
 	//data, err := os.ReadFile("../kotlin-test-results.zip")
-	data, err := os.ReadFile("../rust-test-results.zip")
+	//data, err := os.ReadFile("../rust-test-results.zip")
+	data, err := os.ReadFile("../go-test-results.zip")
 	if err != nil {
 		return nil, err
 	}
