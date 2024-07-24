@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/google/go-github/v57/github"
 	"github.com/joshdk/go-junit"
 	"golang.org/x/exp/slog"
 )
@@ -150,7 +151,9 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 
 	slog.Info("owner:" + owner)
 	slog.Info("repo:" + repo)
-	artifacts, respz, err := gh.Actions.ListArtifacts(ctx, owner, repo, nil)
+
+	listOptions := &github.ListOptions{PerPage: 100}
+	artifacts, respz, err := gh.Actions.ListArtifacts(ctx, owner, repo, listOptions)
 	if (err != nil) || (respz.StatusCode != http.StatusOK) {
 		slog.Error("Error listing artifacts", "owner", owner, "repo", repo, "response", respz, "error", err)
 		return nil, fmt.Errorf("error getting artifact list: %v", err)
