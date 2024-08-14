@@ -35,6 +35,25 @@ var (
 			Type:         "web5",
 		},
 		{
+			Name:         "web5-core-kt",
+			Repo:         "TBD54566975/web5-rs",
+			ArtifactName: "kotlin-test-results",
+			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
+			VectorRegex:  regexp.MustCompile(`(\w+)`),
+			VectorPath:   "test-vectors",
+			Type:         "web5",
+		},
+		{
+			Name:         "web5-rs",
+			Repo:         "TBD54566975/web5-rs",
+			ArtifactName: "rust-test-results",
+			FeatureRegex: regexp.MustCompile(`::(\w+)::(\w+)::(\w+)`),
+			VectorRegex:  regexp.MustCompile(`::(\w+)$`),
+			VectorPath:   "tbdex-test-vectors",
+			Type:         "web5",
+		},
+
+		{
 			Name:         "web5-swift",
 			Repo:         "TBD54566975/web5-swift",
 			ArtifactName: "test-results",
@@ -133,7 +152,13 @@ func GetAllReports() ([]Report, error) {
 			fmt.Println("No Test Vector Suites found.")
 		}
 
-		report, err := sdk.buildReport(web5TestVectorSuites)
+		var report Report
+		if sdk.Name == "web5-rs" {
+			report, err = sdk.buildReportWeb5Rs(web5TestVectorSuites)
+		} else {
+			report, err = sdk.buildReport(web5TestVectorSuites)
+		}
+
 		if err != nil {
 			return nil, fmt.Errorf("error processing data from %s: %v", sdk.Repo, err)
 		}
@@ -220,7 +245,9 @@ func downloadLocal(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	//data, err := os.ReadFile("../junit-results-js-custom.zip")
 	//data, err := os.ReadFile("../kotlin-test-results.zip")
 	//data, err := os.ReadFile("../rust-test-results.zip")
-	data, err := os.ReadFile("../go-test-results.zip")
+	//data, err := os.ReadFile("../go-test-results.zip")
+	data, err := os.ReadFile("../kotlin-test-results.zip")
+	//data, err := os.ReadFile("../tbdex-rust-test-results.zip")
 	if err != nil {
 		return nil, err
 	}
