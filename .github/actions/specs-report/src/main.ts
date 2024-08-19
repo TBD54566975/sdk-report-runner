@@ -1,5 +1,8 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+// import { wait } from './wait'
+import { readActionInputs } from './action-inputs'
+import { getFiles } from './files'
+import { buildTestVectorReport, getTestVectors } from './test-vectors'
 
 /**
  * The main function for the action.
@@ -7,18 +10,37 @@ import { wait } from './wait'
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const {
+      junitReportPaths,
+      specPath,
+      testCasesPrefix
+      // gitToken,
+      // commentOnPr,
+      // failOnMissingVectors,
+      // failOnFailedTestCases
+    } = readActionInputs()
+    const reportFiles = await getFiles(junitReportPaths)
+    const testVectors = await getTestVectors(specPath)
+    const report = await buildTestVectorReport(
+      reportFiles,
+      testVectors,
+      testCasesPrefix
+    )
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    core.info(JSON.stringify({ report }, undefined, 2))
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // const ms: string = core.getInput('milliseconds')
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    // // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
+    // core.debug(`Waiting ${ms} milliseconds ...`)
+
+    // // Log the current timestamp, wait, then log the new timestamp
+    // core.debug(new Date().toTimeString())
+    // await wait(parseInt(ms, 10))
+    // core.debug(new Date().toTimeString())
+
+    // // Set outputs for other workflow steps to use
+    // core.setOutput('time', new Date().toTimeString())
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

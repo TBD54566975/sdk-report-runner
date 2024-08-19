@@ -1,23 +1,40 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'TBD Specs Test Vector Report'
+description: 'Generate and compare spec test vector report'
+author: 'TBD'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
-branding:
-  icon: 'heart'
-  color: 'red'
-
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  junit-report-paths:
+    description:
+      'Glob Path with the JUnit test vectors report, can be a single path or a
+      list of paths in an array'
     required: true
-    default: '1000'
+  spec-path:
+    description: 'The path to the spec submodule'
+    required: true
+  test-cases-prefix:
+    description: 'The prefix of the test cases to be filtered'
+    required: false
+  comment-on-pr:
+    description: 'Whether to comment the summary report on the PR'
+    required: false
+  git-token:
+    description:
+      'The git token to add the comment to the PR (required for PR comments)'
+    required: false
+  fail-on-missing-vectors:
+    description: 'Whether to fail the job if missing test vectors are found'
+    required: false
+  fail-on-failed-test-cases:
+    description: 'Whether to fail the job if failed test cases are found'
+    required: false
 
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  summary:
+    description:
+      'The summary of the test vector report, same as the GITHUB_STEP_SUMMARY'
+  test-vector-report:
+    description: 'The test vector report object'
 
 runs:
   using: node20
