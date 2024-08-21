@@ -1,8 +1,7 @@
 import * as core from '@actions/core'
-// import { wait } from './wait'
 import { readActionInputs } from './action-inputs'
 import { getFiles } from './files'
-import { buildTestVectorReport, getTestVectors } from './test-vectors'
+import { buildTestVectorReport } from './test-vectors'
 
 /**
  * The main function for the action.
@@ -20,14 +19,13 @@ export async function run(): Promise<void> {
       // failOnFailedTestCases
     } = readActionInputs()
     const reportFiles = await getFiles(junitReportPaths)
-    const testVectors = await getTestVectors(specPath)
     const report = await buildTestVectorReport(
+      specPath,
       reportFiles,
-      testVectors,
       testCasesPrefix
     )
 
-    core.info(JSON.stringify({ report }, undefined, 2))
+    core.info(JSON.stringify(report, null, 2))
 
     // const ms: string = core.getInput('milliseconds')
 

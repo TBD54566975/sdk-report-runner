@@ -34106,13 +34106,36 @@ exports.readJsonFile = readJsonFile;
 /***/ }),
 
 /***/ 1886:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseJunitTestCases = void 0;
-const junit2json_1 = __nccwpck_require__(3099);
+const junit2json = __importStar(__nccwpck_require__(3099));
 const files_1 = __nccwpck_require__(7255);
 /**
  * Parses the JUnit XML files
@@ -34122,7 +34145,7 @@ const parseJunitTestCases = async (reportFiles) => {
     const junitTestCases = [];
     for (const file of reportFiles) {
         const fileContent = (0, files_1.readFile)(file);
-        const junit = await (0, junit2json_1.parse)(fileContent);
+        const junit = await junit2json.parse(fileContent);
         if (!junit) {
             throw new Error(`Failed to parse JUnit XML file: ${file}`);
         }
@@ -34175,7 +34198,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
-// import { wait } from './wait'
 const action_inputs_1 = __nccwpck_require__(9437);
 const files_1 = __nccwpck_require__(7255);
 const test_vectors_1 = __nccwpck_require__(7465);
@@ -34192,9 +34214,8 @@ async function run() {
         // failOnFailedTestCases
          } = (0, action_inputs_1.readActionInputs)();
         const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
-        const testVectors = await (0, test_vectors_1.getTestVectors)(specPath);
-        const report = await (0, test_vectors_1.buildTestVectorReport)(reportFiles, testVectors, testCasesPrefix);
-        core.info(JSON.stringify({ report }, undefined, 2));
+        const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, testCasesPrefix);
+        core.info(JSON.stringify(report, null, 2));
         // const ms: string = core.getInput('milliseconds')
         // // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         // core.debug(`Waiting ${ms} milliseconds ...`)
@@ -34244,24 +34265,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.buildTestVectorReport = exports.getTestVectors = void 0;
+exports.buildTestVectorReport = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const files_1 = __nccwpck_require__(7255);
 const junit_handler_1 = __nccwpck_require__(1886);
 /**
- * Reads the test vectors from the spec path.
- * @returns An array of test vectors.
+ * Parses the test vector results from the JUnit XML files against the
+ * test vectors located in the spec path glob pattern.
  */
-const getTestVectors = async (specPath) => {
-    const specPathGlob = `${specPath}/**/test-vectors/**/*.json`;
-    const testVectorsFiles = await (0, files_1.getFiles)(specPathGlob);
-    return testVectorsFiles.filter(checkTestVectorFile).map(mapTestVectorFile);
-};
-exports.getTestVectors = getTestVectors;
-/**
- * Parses the test vector results from the JUnit XML files.
- */
-const buildTestVectorReport = async (reportFiles, testVectors, testCasesPrefix) => {
+const buildTestVectorReport = async (specPath, reportFiles, testCasesPrefix) => {
+    const testVectors = await getTestVectors(specPath);
     const testVectorReport = {
         totalJunitFiles: reportFiles.length,
         totalTestVectors: testVectors.length,
@@ -34279,8 +34292,7 @@ const buildTestVectorReport = async (reportFiles, testVectors, testCasesPrefix) 
     const { totalJunitTestCases, totalSpecTestCases } = addJunitToVectorsTestCases(junitTestCases, testVectors, testCasesPrefix);
     testVectorReport.totalJunitTestCases = totalJunitTestCases;
     testVectorReport.specTestCases = totalSpecTestCases;
-    core.info('JUnit test cases parsed!' +
-        JSON.stringify({ totalJunitTestCases, totalSpecTestCases }, null, 2));
+    core.info(`JUnit test cases parsed!${JSON.stringify({ totalJunitTestCases, totalSpecTestCases }, null, 2)}`);
     for (const testVector of testVectors) {
         if (testVector.testCases.length === 0) {
             testVectorReport.missingVectors.push(testVector);
@@ -34311,10 +34323,19 @@ const buildTestVectorReport = async (reportFiles, testVectors, testCasesPrefix) 
             testVectorReport.successVectors.push(testVector);
         }
     }
-    core.info('Test vector report computed!' + JSON.stringify(testVectorReport, null, 2));
+    core.info(`Test vector report computed!${JSON.stringify(testVectorReport, null, 2)}`);
     return testVectorReport;
 };
 exports.buildTestVectorReport = buildTestVectorReport;
+/**
+ * Reads the test vectors from the spec path.
+ * @returns An array of test vectors.
+ */
+const getTestVectors = async (specPath) => {
+    const specPathGlob = `${specPath}/**/test-vectors/**/*.json`;
+    const testVectorsFiles = await (0, files_1.getFiles)(specPathGlob);
+    return testVectorsFiles.filter(checkTestVectorFile).map(mapTestVectorFile);
+};
 /**
  * Checks if the test vector file is valid.
  * @param file - The file path of the test vector file
@@ -34360,24 +34381,24 @@ const mapTestVectorFile = (file) => {
 const addJunitToVectorsTestCases = (junitTestCases, testVectors, testCasesPrefix) => {
     const totalJunitTestCases = junitTestCases.length;
     let totalSpecTestCases = 0;
-    junitTestCases.forEach(testCase => {
+    for (const testCase of junitTestCases) {
         if (testCasesPrefix && !testCase.name?.startsWith(testCasesPrefix))
-            return;
+            continue;
         // check if testcase is relevant to any test vector key
-        const testVector = testVectors.find(testVector => {
+        const testVector = testVectors.find(test => {
             const testCaseName = testCase.name?.toLowerCase() || '';
             const testCaseNameWords = testCaseName.split(' ');
             return (
             // test case has the same name as the test vector
-            testCaseNameWords.find(word => word === testVector.name) &&
+            testCaseNameWords.find(word => word === test.name) &&
                 // and test case contains the test vector category
-                testCaseName.includes(testVector.category));
+                testCaseName.includes(test.category));
         });
         if (!testVector)
-            return;
+            continue;
         testVector.testCases.push(testCase);
         totalSpecTestCases++;
-    });
+    }
     return { totalJunitTestCases, totalSpecTestCases };
 };
 

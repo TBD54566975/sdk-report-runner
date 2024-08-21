@@ -1,13 +1,9 @@
-import {
-  parse as parseJunit,
-  TestCase as JunitTestCase,
-  TestSuites as JunitTestSuites
-} from 'junit2json'
+import * as junit2json from 'junit2json'
 
 import { readFile } from './files'
 
-export type TestCase = JunitTestCase
-export type TestSuites = JunitTestSuites
+export type TestCase = junit2json.TestCase
+export type TestSuites = junit2json.TestSuites
 
 /**
  * Parses the JUnit XML files
@@ -20,7 +16,7 @@ export const parseJunitTestCases = async (
   for (const file of reportFiles) {
     const fileContent = readFile(file)
 
-    const junit = await parseJunit(fileContent)
+    const junit = await junit2json.parse(fileContent)
     if (!junit) {
       throw new Error(`Failed to parse JUnit XML file: ${file}`)
     }

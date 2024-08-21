@@ -21,6 +21,6 @@ export const readFile = (file: string): string => {
 }
 
 /** Retrieves a parsed JSON file from the given path. */
-export const readJsonFile = (file: string): any => {
+export const readJsonFile = (file: string): unknown => {
   return JSON.parse(readFile(file))
 }
