@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="6.302" tests="111" failures="1" skipped="12">
+  <testsuite name="Root Suite" timestamp="2024-08-21T12:24:06" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Balance" timestamp="2024-08-21T12:24:06" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/balance.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="create" timestamp="2024-08-21T12:24:06" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/balance.spec.js" time="0.004" failures="0">
+    <testcase name="Balance create creates a Balance" time="0.002" classname="creates a Balance">
+    </testcase>
+    <testcase name="Balance create throws if the data is not valid" time="0.000" classname="throws if the data is not valid">
+    </testcase>
+  </testsuite>
+  <testsuite name="sign" timestamp="2024-08-21T12:24:06" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/balance.spec.js" time="0.635" failures="0">
+    <testcase name="Balance sign sets signature property" time="0.516" classname="sets signature property">
+    </testcase>
+    <testcase name="Balance sign includes alg and kid in jws header" time="0.117" classname="includes alg and kid in jws header">
+    </testcase>
+  </testsuite>
+  <testsuite name="verify" timestamp="2024-08-21T12:24:07" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/balance.spec.js" time="0.632" failures="0">
+    <testcase name="Balance verify does not throw an exception if resource integrity is intact" time="0.521" classname="does not throw an exception if resource integrity is intact">
+    </testcase>
+    <testcase name="Balance verify throws an error if no signature is present on the resource provided" time="0.111" classname="throws an error if no signature is present on the resource provided">
+    </testcase>
+  </testsuite>
+  <testsuite name="parse" timestamp="2024-08-21T12:24:07" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/balance.spec.js" time="0.224" failures="0">
+    <testcase name="Balance parse throws an error if payload is not valid JSON" time="0.000" classname="throws an error if payload is not valid JSON">
+    </testcase>
+    <testcase name="Balance parse returns a Resource instance if parsing is successful" time="0.224" classname="returns a Resource instance if parsing is successful">
+    </testcase>
+  </testsuite>
+  <testsuite name="Close" timestamp="2024-08-21T12:24:07" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/close.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="create" timestamp="2024-08-21T12:24:07" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/close.spec.js" time="0.000" failures="0">
+    <testcase name="Close create sets exchangeId and externalId to whatever is passed in" time="0.000" classname="sets exchangeId and externalId to whatever is passed in">
+    </testcase>
+    <testcase name="Close create sets `protocol` to current package version" time="0.000" classname="sets `protocol` to current package version">
+    </testcase>
+  </testsuite>
+  <testsuite name="Crypto" timestamp="2024-08-21T12:24:07" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/crypto.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="sign / verify" timestamp="2024-08-21T12:24:07" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/crypto.spec.js" time="0.003" failures="0">
+    <testcase name="Crypto sign / verify works with detached content" time="0.003" classname="works with detached content">
+    </testcase>
+  </testsuite>
+  <testsuite name="Exchange" timestamp="2024-08-21T12:24:07" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/exchange.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="addMessages" timestamp="2024-08-21T12:24:07" tests="5" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/exchange.spec.js" time="0.589" failures="1">
+    <testcase name="Exchange addMessages adds an Rfq" time="0.000" classname="adds an Rfq">
+    </testcase>
+    <testcase name="Exchange addMessages adds a list of messages in an exchange even if the list is out of order" time="0.000" classname="adds a list of messages in an exchange even if the list is out of order">
+      <failure message="Could not add message (order_01j5te9xpwetj9w57hvqsnp0hw) to exchange because order is not a valid next message" type="Error"><![CDATA[Error: Could not add message (order_01j5te9xpwetj9w57hvqsnp0hw) to exchange because order is not a valid next message
+    at Exchange.addNextMessage (src/exchange.ts:69:13)
+    at Exchange.addMessages (src/exchange.ts:49:12)
+    at Context.<anonymous> (tests/exchange.spec.ts:109:16)
+    at process.processImmediate (node:internal/timers:478:21)]]></failure>
+    </testcase>
+    <testcase name="Exchange addMessages throws if the messages listed do not form a valid exchange" time="0.000" classname="throws if the messages listed do not form a valid exchange">
+    </testcase>
+    <testcase name="Exchange addMessages throws if the messages listed do not have matching exchange_id" time="0.001" classname="throws if the messages listed do not have matching exchange_id">
+    </testcase>
+    <testcase name="Exchange addMessages throws if the messages listed have timestamp after Close" time="0.001" classname="throws if the messages listed have timestamp after Close">
+    </testcase>
+  </testsuite>
+  <testsuite name="addNextMessage" timestamp="2024-08-21T12:24:08" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/exchange.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="message sequence" timestamp="2024-08-21T12:24:08" tests="25" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/exchange.spec.js" time="2.909" failures="0">
+    <testcase name="Exchange addNextMessage message sequence can add an Rfq first but not other message kinds first" time="0.001" classname="can add an Rfq first but not other message kinds first">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add an Order, OrderInstructions, OrderStatus, or Rfq after Rfq" time="0.001" classname="cannot add an Order, OrderInstructions, OrderStatus, or Rfq after Rfq">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Quote after Rfq" time="0.000" classname="can add a Quote after Rfq">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after Rfq" time="0.000" classname="can add a Close after Rfq">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Cancel after Rfq" time="0.000" classname="can add a Cancel after Rfq">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after Quote" time="0.000" classname="can add a Close after Quote">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Cancel after Quote" time="0.000" classname="can add a Cancel after Quote">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add Rfq, Quote, Order, OrderInstructions, OrderStatus, Close, or Cancel after Close" time="0.000" classname="cannot add Rfq, Quote, Order, OrderInstructions, OrderStatus, Close, or Cancel after Close">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after Cancel" time="0.000" classname="can add a Close after Cancel">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a OrderStatus after Cancel" time="0.001" classname="can add a OrderStatus after Cancel">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add Rfq, Quote, Order, OrderInstructions, or Cancel after Cancel" time="0.000" classname="cannot add Rfq, Quote, Order, OrderInstructions, or Cancel after Cancel">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add an Order after Quote" time="0.000" classname="can add an Order after Quote">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add Rfq, Quote, OrderInstructions or OrderStatus after Quote" time="0.000" classname="cannot add Rfq, Quote, OrderInstructions or OrderStatus after Quote">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add an OrderInstructions or a Close after Order" time="0.000" classname="can add an OrderInstructions or a Close after Order">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after Order" time="0.000" classname="can add a Close after Order">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Cancel after Order" time="0.000" classname="can add a Cancel after Order">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add Rfq, Quote, Order, or OrderStatus after Order" time="0.000" classname="cannot add Rfq, Quote, Order, or OrderStatus after Order">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add an OrderStatus after OrderInstructions" time="0.000" classname="can add an OrderStatus after OrderInstructions">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after OrderInstructions" time="0.000" classname="can add a Close after OrderInstructions">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Cancel after OrderInstructions" time="0.000" classname="can add a Cancel after OrderInstructions">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Close after OrderStatus" time="0.000" classname="can add a Close after OrderStatus">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence can add a Cancel after OrderStatus" time="0.000" classname="can add a Cancel after OrderStatus">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add Rfq, Quote, Order, or OrderInstructions after OrderInstructions" time="0.000" classname="cannot add Rfq, Quote, Order, or OrderInstructions after OrderInstructions">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add a message if the protocol versions of the new message and the exchange mismatch" time="0.001" classname="cannot add a message if the protocol versions of the new message and the exchange mismatch">
+    </testcase>
+    <testcase name="Exchange addNextMessage message sequence cannot add a message if the exchangeId of the new message and the exchange mismatch" time="0.000" classname="cannot add a message if the exchangeId of the new message and the exchange mismatch">
+    </testcase>
+  </testsuite>
+  <testsuite name="messages" timestamp="2024-08-21T12:24:11" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/exchange.spec.js" time="0.120" failures="0">
+    <testcase name="Exchange messages returns the list of messages in the exchange" time="0.003" classname="returns the list of messages in the exchange">
+    </testcase>
+  </testsuite>
+  <testsuite name="Offering" timestamp="2024-08-21T12:24:11" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/offering.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="create" timestamp="2024-08-21T12:24:11" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/offering.spec.js" time="0.002" failures="0">
+    <testcase name="Offering create creates an Offering" time="0.002" classname="creates an Offering">
+    </testcase>
+    <testcase name="Offering create throws if the data is not valid" time="0.000" classname="throws if the data is not valid">
+    </testcase>
+  </testsuite>
+  <testsuite name="sign" timestamp="2024-08-21T12:24:11" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/offering.spec.js" time="0.227" failures="0">
+    <testcase name="Offering sign sets signature property" time="0.114" classname="sets signature property">
+    </testcase>
+    <testcase name="Offering sign includes alg and kid in jws header" time="0.113" classname="includes alg and kid in jws header">
+    </testcase>
+  </testsuite>
+  <testsuite name="verify" timestamp="2024-08-21T12:24:11" tests="8" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/offering.spec.js" time="0.343" failures="0">
+    <testcase name="Offering verify does not throw an exception if resource integrity is intact" time="0.230" classname="does not throw an exception if resource integrity is intact">
+    </testcase>
+    <testcase name="Offering verify throws an error if no signature is present on the resource provided" time="0.113" classname="throws an error if no signature is present on the resource provided">
+    </testcase>
+  </testsuite>
+  <testsuite name="parse" timestamp="2024-08-21T12:24:12" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/offering.spec.js" time="0.223" failures="0">
+    <testcase name="Offering parse throws an error if payload is not valid JSON" time="0.001" classname="throws an error if payload is not valid JSON">
+    </testcase>
+    <testcase name="Offering parse returns a Resource instance if parsing is successful" time="0.222" classname="returns a Resource instance if parsing is successful">
+    </testcase>
+  </testsuite>
+  <testsuite name="Parser" timestamp="2024-08-21T12:24:12" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/parse.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="parseMessage" timestamp="2024-08-21T12:24:12" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/parse.spec.js" time="0.001" failures="0">
+    <testcase name="Parser parseMessage throws if an unrecognized message kind is passed" time="0.001" classname="throws if an unrecognized message kind is passed">
+    </testcase>
+  </testsuite>
+  <testsuite name="parseResource" timestamp="2024-08-21T12:24:12" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/parse.spec.js" time="0.001" failures="0">
+    <testcase name="Parser parseResource throws if an unrecognized resource kind is passed" time="0.001" classname="throws if an unrecognized resource kind is passed">
+    </testcase>
+  </testsuite>
+  <testsuite name="Rfq" timestamp="2024-08-21T12:24:12" tests="0" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="create" timestamp="2024-08-21T12:24:12" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.000" failures="0">
+    <testcase name="Rfq create creates an rfq" time="0.000" classname="creates an rfq">
+    </testcase>
+  </testsuite>
+  <testsuite name="sign" timestamp="2024-08-21T12:24:12" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.002" failures="0">
+    <testcase name="Rfq sign sets signature property" time="0.001" classname="sets signature property">
+    </testcase>
+    <testcase name="Rfq sign includes alg and kid in jws header" time="0.001" classname="includes alg and kid in jws header">
+    </testcase>
+  </testsuite>
+  <testsuite name="verify" timestamp="2024-08-21T12:24:12" tests="8" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.003" failures="0">
+    <testcase name="Rfq verify does not throw an exception if message integrity is intact" time="0.002" classname="does not throw an exception if message integrity is intact">
+    </testcase>
+    <testcase name="Rfq verify throws an error if no signature is present on the message provided" time="0.001" classname="throws an error if no signature is present on the message provided">
+    </testcase>
+  </testsuite>
+  <testsuite name="parse" timestamp="2024-08-21T12:24:12" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.000" failures="0">
+    <testcase name="Rfq parse throws an error if payload is not valid JSON" time="0.000" classname="throws an error if payload is not valid JSON">
+    </testcase>
+    <testcase name="Rfq parse returns an instance of Message if parsing is successful" time="0.002" classname="returns an instance of Message if parsing is successful">
+    </testcase>
+  </testsuite>
+  <testsuite name="requireAllPrivateData: true" timestamp="2024-08-21T12:24:12" tests="9" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.017" failures="0">
+    <testcase name="Rfq parse requireAllPrivateData: true succeeds when all privateData is present" time="0.002" classname="succeeds when all privateData is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if private data is missing but hashed fields are present in Rfq.data" time="0.002" classname="throws if private data is missing but hashed fields are present in Rfq.data">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if salt is missing but hashed fields are present in Rfq.data" time="0.001" classname="throws if salt is missing but hashed fields are present in Rfq.data">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.payin.paymentDetails is incorrect but Rfq.data.payin.paymentDetailsHash is present" time="0.002" classname="throws if Rfq.privateData.payin.paymentDetails is incorrect but Rfq.data.payin.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.payout.paymentDetails is incorrect but Rfq.data.payout.paymentDetailsHash is present" time="0.002" classname="throws if Rfq.privateData.payout.paymentDetails is incorrect but Rfq.data.payout.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.claims is incorrect but Rfq.data.claimsHash is present" time="0.001" classname="throws if Rfq.privateData.claims is incorrect but Rfq.data.claimsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.payin.paymentDetails is missing but Rfq.data.payin.paymentDetailsHash is present" time="0.002" classname="throws if Rfq.privateData.payin.paymentDetails is missing but Rfq.data.payin.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.payout.paymentDetails is missing but Rfq.data.payout.paymentDetailsHash is present" time="0.002" classname="throws if Rfq.privateData.payout.paymentDetails is missing but Rfq.data.payout.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: true throws if Rfq.privateData.claims is missing but Rfq.data.claimsHash is present" time="0.002" classname="throws if Rfq.privateData.claims is missing but Rfq.data.claimsHash is present">
+    </testcase>
+  </testsuite>
+  <testsuite name="requireAllPrivateData: false" timestamp="2024-08-21T12:24:12" tests="4" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.006" failures="0">
+    <testcase name="Rfq parse requireAllPrivateData: false throws if salt is missing but hashed fields are present in Rfq.data" time="0.001" classname="throws if salt is missing but hashed fields are present in Rfq.data">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: false throws if Rfq.privateData.payin.paymentDetails is missing but Rfq.data.payin.paymentDetailsHash is present" time="0.001" classname="throws if Rfq.privateData.payin.paymentDetails is missing but Rfq.data.payin.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: false throws if Rfq.privateData.payout.paymentDetails is missing but Rfq.data.payout.paymentDetailsHash is present" time="0.002" classname="throws if Rfq.privateData.payout.paymentDetails is missing but Rfq.data.payout.paymentDetailsHash is present">
+    </testcase>
+    <testcase name="Rfq parse requireAllPrivateData: false throws if Rfq.privateData.claims is missing but Rfq.data.claimsHash is present" time="0.002" classname="throws if Rfq.privateData.claims is missing but Rfq.data.claimsHash is present">
+    </testcase>
+  </testsuite>
+  <testsuite name="verifySignature" timestamp="2024-08-21T12:24:12" tests="1" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.000" failures="0">
+    <testcase name="Rfq verifySignature throws if signature is not present" time="0.000" classname="throws if signature is not present">
+    </testcase>
+  </testsuite>
+  <testsuite name="verifyOfferingRequirements" timestamp="2024-08-21T12:24:12" tests="14" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.333" failures="0">
+    <testcase name="Rfq verifyOfferingRequirements succeeds if Rfq satisfies Offering required claims and payin amount" time="0.059" classname="succeeds if Rfq satisfies Offering required claims and payin amount">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements succeeds if Rfq satisfies required payin amount and Offering has no required claims" time="0.200" classname="succeeds if Rfq satisfies required payin amount and Offering has no required claims">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if claims do not fulfill Offering&apos;s requirements" time="0.011" classname="throws an error if claims do not fulfill Offering&apos;s requirements">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if rfq protocol doesn&apos;t match the provided offering&apos;s protocol" time="0.001" classname="throws an error if rfq protocol doesn&apos;t match the provided offering&apos;s protocol">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if offeringId doesn&apos;t match the provided offering&apos;s id" time="0.001" classname="throws an error if offeringId doesn&apos;t match the provided offering&apos;s id">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payinAmount exceeds the provided offering&apos;s max" time="0.000" classname="throws an error if payinAmount exceeds the provided offering&apos;s max">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payinAmount is less than the provided offering&apos;s minAmount" time="0.000" classname="throws an error if payinAmount is less than the provided offering&apos;s minAmount">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payinMethod kind cannot be validated against the provided offering&apos;s payinMethod kinds" time="0.000" classname="throws an error if payinMethod kind cannot be validated against the provided offering&apos;s payinMethod kinds">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if paymentDetails is present but offering&apos;s requiredPaymentDetails is omitted" time="0.000" classname="throws an error if paymentDetails is present but offering&apos;s requiredPaymentDetails is omitted">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements succeeds if paymentDetails is omitted and offering&apos;s requiredPaymentDetails is omitted" time="0.015" classname="succeeds if paymentDetails is omitted and offering&apos;s requiredPaymentDetails is omitted">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payinMethod paymentDetails cannot be validated against the provided offering&apos;s payinMethod requiredPaymentDetails" time="0.005" classname="throws an error if payinMethod paymentDetails cannot be validated against the provided offering&apos;s payinMethod requiredPaymentDetails">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payoutMethod kind cannot be validated against the provided offering&apos;s payoutMethod kinds" time="0.004" classname="throws an error if payoutMethod kind cannot be validated against the provided offering&apos;s payoutMethod kinds">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements throws an error if payoutMethod paymentDetails cannot be validated against the provided offering&apos;s payoutMethod requiredPaymentDetails" time="0.009" classname="throws an error if payoutMethod paymentDetails cannot be validated against the provided offering&apos;s payoutMethod requiredPaymentDetails">
+    </testcase>
+    <testcase name="Rfq verifyOfferingRequirements accepts selected payment method if it matches one but not all of the Offerings requiredPaymentDetails of matching kind" time="0.011" classname="accepts selected payment method if it matches one but not all of the Offerings requiredPaymentDetails of matching kind">
+    </testcase>
+  </testsuite>
+  <testsuite name="verifyClaims" timestamp="2024-08-21T12:24:12" tests="2" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/rfq.spec.js" time="0.020" failures="0">
+    <testcase name="Rfq verifyClaims does not throw an exception if an rfq&apos;s claims fulfill the provided offering&apos;s requirements" time="0.011" classname="does not throw an exception if an rfq&apos;s claims fulfill the provided offering&apos;s requirements">
+    </testcase>
+    <testcase name="Rfq verifyClaims throws an exception if an rfq&apos;s claims dont fulfill the provided offering&apos;s requirements" time="0.009" classname="throws an exception if an rfq&apos;s claims dont fulfill the provided offering&apos;s requirements">
+    </testcase>
+  </testsuite>
+  <testsuite name="TbdexTestVectorsProtocol" timestamp="2024-08-21T12:24:12" tests="10" file="/home/Workspace/tbdex-js/packages/protocol/tests/compiled/packages/protocol/tests/test-vectors.spec.js" time="0.005" failures="0">
+    <testcase name="TbdexTestVectorsProtocol parse_cancel" time="0.001" classname="parse_cancel">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_close" time="0.000" classname="parse_close">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_offering" time="0.001" classname="parse_offering">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_order" time="0.000" classname="parse_order">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_orderstatus" time="0.000" classname="parse_orderstatus">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_orderinstructions" time="0.001" classname="parse_orderinstructions">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_quote" time="0.000" classname="parse_quote">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_rfq" time="0.001" classname="parse_rfq">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_rfq_omit_private_data" time="0.000" classname="parse_rfq_omit_private_data">
+    </testcase>
+    <testcase name="TbdexTestVectorsProtocol parse_balance" time="0.000" classname="parse_balance">
+    </testcase>
+  </testsuite>
+</testsuites>

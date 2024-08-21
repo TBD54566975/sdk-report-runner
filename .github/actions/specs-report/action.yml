@@ -1,0 +1,41 @@
+name: 'TBD Specs Test Vector Report'
+description: 'Generate and compare spec test vector report'
+author: 'TBD'
+
+inputs:
+  junit-report-paths:
+    description:
+      'Glob Path with the JUnit test vectors report, can be a single path or a
+      list of paths in an array'
+    required: true
+  spec-path:
+    description: 'The relative path to the tbd spec submodule folder'
+    required: true
+  test-cases-prefix:
+    description: 'The prefix of the test cases to be filtered'
+    required: false
+  comment-on-pr:
+    description: 'Whether to comment the summary report on the PR'
+    required: false
+  git-token:
+    description:
+      'The git token to add the comment to the PR (required for PR comments)'
+    required: false
+  fail-on-missing-vectors:
+    description: 'Whether to fail the job if missing test vectors are found'
+    required: false
+  fail-on-failed-test-cases:
+    description: 'Whether to fail the job if failed test cases are found'
+    required: false
+
+# Define your outputs here.
+outputs:
+  summary:
+    description:
+      'The summary of the test vector report, same as the GITHUB_STEP_SUMMARY'
+  test-vector-report:
+    description: 'The test vector report object'
+
+runs:
+  using: node20
+  main: dist/index.js

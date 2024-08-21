@@ -1,0 +1,53 @@
+name: Specs Report CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/actions/specs-report/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/actions/specs-report/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript:
+    name: TypeScript Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .github/actions/specs-report
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .github/actions/specs-report/.node-version
+          cache: npm
+          cache-dependency-path: .github/actions/specs-report/package-lock.json
+
+      - name: Install Dependencies
+        id: npm-ci
+        run: npm ci
+
+      - name: Check Format
+        id: npm-format-check
+        run: npm run format:check
+
+      - name: Lint
+        id: npm-lint
+        run: npm run lint
+
+      - name: Test
+        id: npm-ci-test
+        run: npm run ci-test
