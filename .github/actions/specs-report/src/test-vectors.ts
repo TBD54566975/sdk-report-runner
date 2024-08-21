@@ -3,10 +3,7 @@ import * as core from '@actions/core'
 import { getFiles, readJsonFile } from './files'
 import { parseJunitTestCases, TestCase } from './junit-handler'
 
-/**
- * Represents a test vector
- */
-interface TestVector {
+export interface TestVector {
   /** The category of the test vector */
   category: string
   /** The name of the test vector */
@@ -17,10 +14,7 @@ interface TestVector {
   testCases: TestCase[]
 }
 
-/**
- * Represents a report of test vector execution
- */
-interface TestVectorReport {
+export interface TestVectorReport {
   /** The total number of JUnit XML files */
   totalJunitFiles: number
   /** The total number of test vectors */

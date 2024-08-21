@@ -1,46 +1,69 @@
 import * as core from '@actions/core'
 import { readActionInputs } from './action-inputs'
 import { getFiles } from './files'
-import { buildTestVectorReport } from './test-vectors'
+import { buildTestVectorReport, TestVectorReport } from './test-vectors'
+import { generateSummary } from './summary-report'
+import { addCommentToPr } from './pr-comment'
 
 /**
  * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
   try {
     const {
       junitReportPaths,
       specPath,
-      testCasesPrefix
-      // gitToken,
-      // commentOnPr,
-      // failOnMissingVectors,
-      // failOnFailedTestCases
+      testCasesPrefix,
+      gitToken,
+      commentOnPr,
+      failOnMissingVectors,
+      failOnFailedTestCases
     } = readActionInputs()
+
     const reportFiles = await getFiles(junitReportPaths)
+
     const report = await buildTestVectorReport(
       specPath,
       reportFiles,
       testCasesPrefix
     )
 
-    core.info(JSON.stringify(report, null, 2))
+    const summary = generateSummary(report)
 
-    // const ms: string = core.getInput('milliseconds')
+    if (commentOnPr) {
+      await addCommentToPr(summary, gitToken)
+    }
 
-    // // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    // core.debug(`Waiting ${ms} milliseconds ...`)
-
-    // // Log the current timestamp, wait, then log the new timestamp
-    // core.debug(new Date().toTimeString())
-    // await wait(parseInt(ms, 10))
-    // core.debug(new Date().toTimeString())
-
-    // // Set outputs for other workflow steps to use
-    // core.setOutput('time', new Date().toTimeString())
+    setJobStatus(report, failOnMissingVectors, failOnFailedTestCases)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
+  }
+}
+
+/**
+ * Sets the job status based on the test vector results.
+ * @param testVectorResults - The test vector report object
+ * @param failOnMissingVectors - Whether to fail the job if missing test vectors are found
+ * @param failOnFailedTestCases - Whether to fail the job if failed test cases are found
+ */
+const setJobStatus = (
+  testVectorResults: TestVectorReport,
+  failOnMissingVectors: boolean,
+  failOnFailedTestCases: boolean
+): void => {
+  if (testVectorResults.specFailedTestCases > 0 && failOnFailedTestCases) {
+    core.setFailed('❌ Failed test vectors found')
+  } else if (
+    testVectorResults.missingVectors.length > 0 &&
+    failOnMissingVectors
+  ) {
+    core.setFailed('❌ Missing test vectors found')
+  } else {
+    if (testVectorResults.specSkippedTestCases > 0) {
+      core.warning('⚠️ Skipped test vectors found')
+    }
+    core.setOutput('success', 'true')
+    core.info('✅ All test vectors passed')
   }
 }
