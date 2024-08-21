@@ -38407,6 +38407,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseJunitTestCases = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const junit2json = __importStar(__nccwpck_require__(3099));
 const files_1 = __nccwpck_require__(7255);
 /**
@@ -38414,9 +38415,12 @@ const files_1 = __nccwpck_require__(7255);
  * @param reportFiles - An array of file paths.
  */
 const parseJunitTestCases = async (reportFiles) => {
+    core.info(`Parsing JUnit XML files: ${reportFiles.join(', ')}`);
     const junitTestCases = [];
     for (const file of reportFiles) {
         const fileContent = (0, files_1.readFile)(file);
+        core.debug(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`);
+        core.info(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`);
         const junit = await junit2json.parse(fileContent);
         if (!junit) {
             throw new Error(`Failed to parse JUnit XML file: ${file}`);
@@ -38831,7 +38835,7 @@ const buildTestVectorReport = async (specPath, reportFiles, testCasesPrefix) => 
     const { totalJunitTestCases, totalSpecTestCases } = addJunitToVectorsTestCases(junitTestCases, testVectors, testCasesPrefix);
     testVectorReport.totalJunitTestCases = totalJunitTestCases;
     testVectorReport.specTestCases = totalSpecTestCases;
-    core.info(`JUnit test cases parsed!${JSON.stringify({ totalJunitTestCases, totalSpecTestCases }, null, 2)}`);
+    core.info(`JUnit test cases parsed!\n${JSON.stringify({ totalJunitTestCases, totalSpecTestCases }, null, 2)}`);
     for (const testVector of testVectors) {
         if (testVector.testCases.length === 0) {
             testVectorReport.missingVectors.push(testVector);

@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import * as junit2json from 'junit2json'
 
 import { readFile } from './files'
@@ -12,9 +13,12 @@ export type TestSuites = junit2json.TestSuites
 export const parseJunitTestCases = async (
   reportFiles: string[]
 ): Promise<TestCase[]> => {
+  core.info(`Parsing JUnit XML files: ${reportFiles.join(', ')}`)
   const junitTestCases: TestCase[] = []
   for (const file of reportFiles) {
     const fileContent = readFile(file)
+    core.debug(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`)
+    core.info(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`)
 
     const junit = await junit2json.parse(fileContent)
     if (!junit) {

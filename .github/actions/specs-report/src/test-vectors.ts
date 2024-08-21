@@ -69,7 +69,7 @@ export const buildTestVectorReport = async (
   testVectorReport.totalJunitTestCases = totalJunitTestCases
   testVectorReport.specTestCases = totalSpecTestCases
   core.info(
-    `JUnit test cases parsed!${JSON.stringify(
+    `JUnit test cases parsed!\n${JSON.stringify(
       { totalJunitTestCases, totalSpecTestCases },
       null,
       2
