@@ -9,7 +9,7 @@ inputs:
       list of paths in an array'
     required: true
   spec-path:
-    description: 'The path to the spec submodule'
+    description: 'The relative path to the tbd spec submodule folder'
     required: true
   test-cases-prefix:
     description: 'The prefix of the test cases to be filtered'

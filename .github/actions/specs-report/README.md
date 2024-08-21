@@ -2,6 +2,33 @@
 
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
+GitHub Action to Parse and Generate tbd Specs Reports
+
+## Usage
+
+```yaml
+# add it as an step on your CI workflow right after your tests
+
+- name: Execute Spec Test Vector Report
+   # assuming you have named the tests steps as `tests`
+   # it will always run and report your tests results even if they failed
+   if: always() && steps.tests.conclusion != 'skipped'
+   uses: TBD54566975/tbd-sdk-report-runner/.github/actions/specs-report@main
+   with:
+      junit-report-paths: packages/*/results.xml # Glob Path with the JUnit test vectors report
+      spec-path: tbdex # relative path to the tbd spec submodule folder
+      fail-on-missing-vectors: true # if false, it will not fail the build if the test vectors are missing
+      fail-on-failed-test-cases: true # if false, it will not fail the build if the test cases are failed
+      comment-on-pr: true # if true, it will comment on the PR with the report
+      git-token: ${{ secrets.GITHUB_TOKEN }} # the git token to use to comment on the PR
+```
+
+_Check the available parameters in the [action.yml](./action.yml) file_
+
+Example report:
+
+![Example Report](./example-report.png)
+
 ## Initial Setup
 
 1. :hammer_and_wrench: Install the dependencies
@@ -23,11 +50,10 @@
    ...
    ```
 
-## Update the Action Code
+## Maintaining the Action Code
 
-The [`src/`](./src/) directory is the heart of your action! This contains the
-source code that will be run when your action is invoked. You can replace the
-contents of this directory with your own code.
+The [`src/`](./src/) directory is the heart of the action! This contains the
+source code that will be run when your action is invoked.
 
 There are a few things to keep in mind when writing your action code:
 
@@ -50,104 +76,9 @@ There are a few things to keep in mind when writing your action code:
   For more information about the GitHub Actions toolkit, see the
   [documentation](https://github.com/actions/toolkit/blob/master/README.md).
 
-So, what are you waiting for? Go ahead and start customizing your action!
-
-1. Create a new branch
-
-   ```bash
-   git checkout -b releases/v1
-   ```
-
-1. Replace the contents of `src/` with your action code
-1. Add tests to `__tests__/` for your source code
-1. Format, test, and build the action
-
-   ```bash
-   npm run all
-   ```
-
-   > This step is important! It will run [`ncc`](https://github.com/vercel/ncc)
-   > to build the final JavaScript action code with all dependencies included.
-   > If you do not run this step, your action will not work correctly when it is
-   > used in a workflow. This step also includes the `--license` option for
-   > `ncc`, which will create a license file for all of the production node
-   > modules used in your project.
-
-1. Commit your changes
-
-   ```bash
-   git add .
-   git commit -m "My first action is ready!"
-   ```
-
-1. Push them to your repository
-
-   ```bash
-   git push -u origin releases/v1
-   ```
-
-1. Create a pull request and get feedback on your action
-1. Merge the pull request into the `main` branch
-
-Your action is now published! :rocket:
-
 For information about versioning your action, see
 [Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
 in the GitHub Actions toolkit.
-
-## Validate the Action
-
-You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
-
-```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
-
-  - name: Test Local Action
-    id: test-action
-    uses: ./
-    with:
-      milliseconds: 1000
-
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
-```
-
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/typescript-action/actions)! :rocket:
-
-## Usage
-
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-To include the action in a workflow in another repository, you can use the
-`uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
-hash.
-
-```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
-
-  - name: Test Local Action
-    id: test-action
-    uses: actions/typescript-action@v1 # Commit with the `v1` tag
-    with:
-      milliseconds: 1000
-
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
-```
 
 ## Publishing a New Release
 
