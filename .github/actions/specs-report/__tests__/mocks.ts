@@ -270,3 +270,30 @@ export const FAILURE_MOCK = {
     ]
   }
 }
+
+export const WEB5_KT_JUNIT_FILES = [
+  `${__dirname}/assets/web5-kt-web5.sdk.credentials.Web5TestVectorsCredentials.xml`,
+  `${__dirname}/assets/web5-kt-web5.sdk.credentials.Web5TestVectorsPresentationExchange.xml`
+]
+
+export const WEB5_TEST_VECTORS_FILES = [
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/credentials/create.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/credentials/verify.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/crypto_ed25519/sign.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/crypto_ed25519/verify.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/crypto_es256k/sign.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/crypto_es256k/verify.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/did_dht/create.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/did_dht/resolve.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/did_jwk/resolve.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/did_web/resolve.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/portable_did/parse.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/create_presentation_from_credentials.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/evaluate_presentation.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/select_credentials.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/validate_definition.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/validate_submission.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vc_jwt/decode.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vc_jwt/verify.json',
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vectors.schema.json'
+]

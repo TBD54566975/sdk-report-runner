@@ -189,14 +189,23 @@ const addJunitToVectorsTestCases = (
     if (testCasesPrefix && !testCase.name?.startsWith(testCasesPrefix)) continue
 
     // check if testcase is relevant to any test vector key
-    const testVector = testVectors.find(test => {
+    const testVector = testVectors.find(vector => {
+      const vectorCategoryName = vector.category.toLowerCase()
+      const vectorCategoryNameClean = vectorCategoryName.replace(/[-_\s]/g, '')
+
       const testCaseName = testCase.name?.toLowerCase() || ''
       const testCaseNameWords = testCaseName.split(' ')
+      const testCaseClassName = testCase.classname?.toLowerCase() || ''
+
       return (
         // test case has the same name as the test vector
-        testCaseNameWords.find(word => word === test.name) &&
+        testCaseNameWords.find(word => word === vector.name) &&
         // and test case contains the test vector category
-        testCaseName.includes(test.category)
+        (testCaseName.includes(vectorCategoryName) ||
+          testCaseName.includes(vectorCategoryNameClean) ||
+          // or test case class name contains the test vector category
+          testCaseClassName.includes(vectorCategoryName) ||
+          testCaseClassName.includes(vectorCategoryNameClean))
       )
     })
     if (!testVector) continue
