@@ -365,7 +365,9 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 		tbdexOpt.Page = resp.NextPage
 	}
 
-	for _, sdk := range SDKs {
+	// Iterate using index to modify the original SDKMeta in the slice
+	for i := range SDKs {
+		sdk := &SDKs[i] // Get the pointer to the current SDKMeta in the slice
 
 		// default values
 		sdk.SubmoduleCommit = "-"
@@ -413,127 +415,6 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 			fmt.Printf("%s cannot determine how far behind with hash: %s in %s\n", sdk.Repo, submoduleCommitSHA, submodulePath)
 		}
 	}
-	return nil
-}
-
-func CheckSubmoduleStatus(ctx context.Context) error {
-	for _, sdk := range SDKs {
-		owner, repo, _ := strings.Cut(sdk.Repo, "/")
-
-		// Determine submodule name based on SDK type
-		submoduleName := "web5-spec"
-		if sdk.Type == "tbdex" {
-			submoduleName = "tbdex"
-		}
-
-		// Get the current submodule commit
-		submoduleRef, _, err := gh.Git.GetRef(ctx, owner, repo, "heads/main")
-		if err != nil {
-			return fmt.Errorf("error getting ref for %s: %v", sdk.Repo, err)
-		}
-
-		tree, _, err := gh.Git.GetTree(ctx, owner, repo, *submoduleRef.Object.SHA, true)
-		if err != nil {
-			return fmt.Errorf("error getting tree for %s: %v", sdk.Repo, err)
-		}
-
-		var submoduleCommit string
-		for _, entry := range tree.Entries {
-			if *entry.Path == submoduleName {
-				submoduleCommit = *entry.SHA
-				break
-			}
-		}
-
-		if submoduleCommit == "" {
-			fmt.Printf("submodule %s not found in %s\n", submoduleName, sdk.Repo)
-			continue
-		}
-
-		// Get the latest commit of the submodule repo
-		submoduleOwner := "TBD54566975"
-		submoduleRepo := submoduleName
-		latestCommit, _, err := gh.Repositories.GetCommit(ctx, submoduleOwner, submoduleRepo, "main", nil)
-		if err != nil {
-			return fmt.Errorf("error getting latest commit for %s: %v", submoduleRepo, err)
-		}
-
-		// Manual count of commits behind or ahead
-		commits, _, err := gh.Repositories.ListCommits(ctx, submoduleOwner, submoduleRepo, &github.CommitsListOptions{
-			SHA: "main",
-		})
-		if err != nil {
-			return fmt.Errorf("error listing commits for %s: %v", submoduleRepo, err)
-		}
-
-		var commitsBehind int
-		var commitsAhead int
-		var found bool
-
-		for i, commit := range commits {
-			if *commit.SHA == submoduleCommit {
-				commitsBehind = i
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			// If not found, the submodule might be ahead
-			//commits, _, err = gh.Repositories.ListCommits(ctx, submoduleOwner, submoduleRepo, &github.CommitsListOptions{
-			//	SHA: submoduleCommit,
-			//})
-
-			commits, _, err := gh.Repositories.ListCommits(ctx, submoduleOwner, submoduleRepo, &github.CommitsListOptions{
-				SHA: "main",
-				ListOptions: github.ListOptions{
-					PerPage: 100, // Increase this number to retrieve more commits per page
-				},
-			})
-
-			if err != nil {
-				return fmt.Errorf("error listing commits for %s: %v", submoduleRepo, err)
-			}
-
-			for i, commit := range commits {
-				if *commit.SHA == *latestCommit.SHA {
-					commitsAhead = i
-					found = true
-					break
-				}
-			}
-		}
-
-		if !found {
-			slog.Warn("Unable to determine relative position of submodule",
-				"repo", sdk.Repo,
-				"submodule", submoduleName,
-				"submodule_commit", submoduleCommit[:7],
-				"main_commit", (*latestCommit.SHA)[:7])
-		} else if commitsBehind > 0 {
-			slog.Info("Submodule status",
-				"repo", sdk.Repo,
-				"submodule", submoduleName,
-				"submodule_commit", submoduleCommit[:7],
-				"main_commit", (*latestCommit.SHA)[:7],
-				"commits_behind", commitsBehind)
-		} else if commitsAhead > 0 {
-			slog.Info("Submodule status",
-				"repo", sdk.Repo,
-				"submodule", submoduleName,
-				"submodule_commit", submoduleCommit[:7],
-				"main_commit", (*latestCommit.SHA)[:7],
-				"commits_ahead", commitsAhead)
-		} else {
-			slog.Info("Submodule is up to date",
-				"repo", sdk.Repo,
-				"submodule", submoduleName,
-				"commit", submoduleCommit[:7])
-		}
-
-		slog.Info("--------------------")
-	}
-
 	return nil
 }
 
