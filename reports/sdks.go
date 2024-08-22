@@ -363,7 +363,8 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 		// Get the current submodule commit for the SDK repo
 		submoduleFileContent, _, _, err := gh.Repositories.GetContents(ctx, owner, repo, submodulePath, nil)
 		if err != nil {
-			return fmt.Errorf("error getting submodule content for %s: %v", sdk.Repo, err)
+			fmt.Printf("error getting submodule content for %s: %v.. continuing", sdk.Repo, err)
+			continue
 		}
 
 		submoduleCommitSHA := *submoduleFileContent.SHA
