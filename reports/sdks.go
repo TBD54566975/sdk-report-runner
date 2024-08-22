@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -154,7 +153,7 @@ func GetAllReports() ([]Report, error) {
 
 		err = CheckSubmoduleStatus(context.Background())
 		if err != nil {
-			log.Fatalf("Error checking submodule status: %v", err)
+			fmt.Println("Error checking submodule status: %v", err)
 		}
 
 		var report Report
@@ -270,7 +269,8 @@ func CheckSubmoduleStatus(ctx context.Context) error {
 		}
 
 		if submoduleCommit == "" {
-			return fmt.Errorf("submodule %s not found in %s", submoduleName, sdk.Repo)
+			fmt.Printf("submodule %s not found in %s\n", submoduleName, sdk.Repo)
+			continue
 		}
 
 		// Get the latest commit of the submodule repo
@@ -287,12 +287,12 @@ func CheckSubmoduleStatus(ctx context.Context) error {
 			return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
 		}
 
-		fmt.Printf("Repo: %s\n", sdk.Repo)
-		fmt.Printf("Submodule: %s\n", submoduleName)
-		fmt.Printf("Current commit: %s\n", submoduleCommit[:7])
-		fmt.Printf("Latest commit: %s\n", (*latestCommit.SHA)[:7])
-		fmt.Printf("Commits behind: %d\n", comparison.BehindBy)
-		fmt.Println("--------------------")
+		slog.Info("Repo: %s\n", sdk.Repo)
+		slog.Info("Submodule: %s\n", submoduleName)
+		slog.Info("Current commit: %s\n", submoduleCommit[:7])
+		slog.Info("Latest commit: %s\n", (*latestCommit.SHA)[:7])
+		slog.Info("Commits behind: %d\n", comparison.BehindBy)
+		slog.Info("--------------------")
 	}
 
 	return nil
