@@ -113,6 +113,11 @@ var (
 func GetAllReports() ([]Report, error) {
 	ctx := context.Background()
 
+	err := CheckSubmoduleStatus2(context.Background())
+	if err != nil {
+		fmt.Println("Error checking submodufle status: %v", err)
+	}
+
 	var reports []Report
 	for _, sdk := range SDKs {
 		slog.Info("Processing: " + sdk.Name)
@@ -150,11 +155,6 @@ func GetAllReports() ([]Report, error) {
 			}
 		} else {
 			fmt.Println("No Test Vector Suites found.")
-		}
-
-		err = CheckSubmoduleStatus2(context.Background())
-		if err != nil {
-			fmt.Println("Error checking submodule status: %v", err)
 		}
 
 		var report Report
@@ -346,6 +346,11 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 	}
 
 	for _, sdk := range SDKs {
+
+		// default values
+		sdk.SubmoduleCommit = "-"
+		sdk.SubmoduleCommitBehind = -1
+
 		owner, repo, _ := strings.Cut(sdk.Repo, "/")
 
 		// Determine the submodule path based on the SDK type
@@ -369,17 +374,19 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 
 		submoduleCommitSHA := *submoduleFileContent.SHA
 		fmt.Printf("Current submodule commit for %s in %s: %s \n", submodulePath, sdk.Repo, submoduleCommitSHA)
+		sdk.SubmoduleCommit = submoduleCommitSHA
 
 		// Check how far behind the submodule commit is from the allCommits
 		counter := 0
 		found := false
 		for _, commit := range allCommits {
-			counter++
 			if *commit.SHA == submoduleCommitSHA {
 				fmt.Printf("%s is behind by %d commits in %s \n", sdk.Repo, counter, submodulePath)
+				sdk.SubmoduleCommitBehind = counter
 				found = true
 				break
 			}
+			counter++
 		}
 
 		if !found {
