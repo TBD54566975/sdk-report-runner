@@ -242,69 +242,71 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	return artifact, nil
 }
 
-//func CheckSubmoduleStatus(ctx context.Context) error {
-//	for _, sdk := range SDKs {
-//		owner, repo, _ := strings.Cut(sdk.Repo, "/")
+//	func CheckSubmoduleStatus(ctx context.Context) error {
+//		for _, sdk := range SDKs {
+//			owner, repo, _ := strings.Cut(sdk.Repo, "/")
 //
-//		// Determine submodule name based on SDK type
-//		submoduleName := "web5-spec"
-//		if sdk.Type == "tbdex" {
-//			submoduleName = "tbdex"
-//		}
-//
-//		// Get the current submodule commit
-//		submoduleRef, _, err := gh.Git.GetRef(ctx, owner, repo, "heads/main")
-//		if err != nil {
-//			return fmt.Errorf("error getting ref for %s: %v", sdk.Repo, err)
-//		}
-//
-//		tree, _, err := gh.Git.GetTree(ctx, owner, repo, *submoduleRef.Object.SHA, true)
-//		if err != nil {
-//			return fmt.Errorf("error getting tree for %s: %v", sdk.Repo, err)
-//		}
-//
-//		var submoduleCommit string
-//		for _, entry := range tree.Entries {
-//			if *entry.Path == submoduleName {
-//				submoduleCommit = *entry.SHA
-//				break
+//			// Determine submodule name based on SDK type
+//			submoduleName := "web5-spec"
+//			if sdk.Type == "tbdex" {
+//				submoduleName = "tbdex"
 //			}
+//
+//			// Get the current submodule commit
+//			submoduleRef, _, err := gh.Git.GetRef(ctx, owner, repo, "heads/main")
+//			if err != nil {
+//				return fmt.Errorf("error getting ref for %s: %v", sdk.Repo, err)
+//			}
+//
+//			tree, _, err := gh.Git.GetTree(ctx, owner, repo, *submoduleRef.Object.SHA, true)
+//			if err != nil {
+//				return fmt.Errorf("error getting tree for %s: %v", sdk.Repo, err)
+//			}
+//
+//			var submoduleCommit string
+//			for _, entry := range tree.Entries {
+//				if *entry.Path == submoduleName {
+//					submoduleCommit = *entry.SHA
+//					break
+//				}
+//			}
+//
+//			if submoduleCommit == "" {
+//				fmt.Printf("submodule %s not found in %s\n", submoduleName, sdk.Repo)
+//				continue
+//			}
+//
+//			// Get the latest commit of the submodule repo
+//			submoduleOwner := "TBD54566975"
+//			submoduleRepo := submoduleName
+//			latestCommit, _, err := gh.Repositories.GetCommit(ctx, submoduleOwner, submoduleRepo, "main", nil)
+//			if err != nil {
+//				return fmt.Errorf("error getting latest commit for %s: %v", submoduleRepo, err)
+//			}
+//
+//			// Compare commits
+//			comparison, _, err := gh.Repositories.CompareCommits(ctx, submoduleOwner, submoduleRepo, submoduleCommit, *latestCommit.SHA, nil)
+//			if err != nil {
+//				return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
+//			}
+//
+//			slog.Info("Submodule status",
+//				"repo", sdk.Repo,
+//				"submodule", submoduleName,
+//				"current_commit", submoduleCommit[:7],
+//				"latest_commit", (*latestCommit.SHA)[:7],
+//				"commits_behind", *comparison.BehindBy)
+//			slog.Info("--------------------")
 //		}
 //
-//		if submoduleCommit == "" {
-//			fmt.Printf("submodule %s not found in %s\n", submoduleName, sdk.Repo)
-//			continue
-//		}
-//
-//		// Get the latest commit of the submodule repo
-//		submoduleOwner := "TBD54566975"
-//		submoduleRepo := submoduleName
-//		latestCommit, _, err := gh.Repositories.GetCommit(ctx, submoduleOwner, submoduleRepo, "main", nil)
-//		if err != nil {
-//			return fmt.Errorf("error getting latest commit for %s: %v", submoduleRepo, err)
-//		}
-//
-//		// Compare commits
-//		comparison, _, err := gh.Repositories.CompareCommits(ctx, submoduleOwner, submoduleRepo, submoduleCommit, *latestCommit.SHA, nil)
-//		if err != nil {
-//			return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
-//		}
-//
-//		slog.Info("Submodule status",
-//			"repo", sdk.Repo,
-//			"submodule", submoduleName,
-//			"current_commit", submoduleCommit[:7],
-//			"latest_commit", (*latestCommit.SHA)[:7],
-//			"commits_behind", *comparison.BehindBy)
-//		slog.Info("--------------------")
+//		return nil
 //	}
-//
-//	return nil
-//}
-
 func CheckSubmoduleStatus2(ctx context.Context) error {
-	var allCommits []*github.RepositoryCommit
-	opt := &github.CommitsListOptions{
+	var allWeb5SpecCommits []*github.RepositoryCommit
+	var allTbdexCommits []*github.RepositoryCommit
+
+	// Fetch commits for web5-spec
+	web5SpecOpt := &github.CommitsListOptions{
 		SHA: "main",
 		ListOptions: github.ListOptions{
 			PerPage: 100,
@@ -312,39 +314,60 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 	}
 
 	for {
-		commits, resp, err := gh.Repositories.ListCommits(ctx, "TBD54566975", "web5-spec", opt)
+		commits, resp, err := gh.Repositories.ListCommits(ctx, "TBD54566975", "web5-spec", web5SpecOpt)
 		if err != nil {
-			log.Fatalf("Error listing commits: %v", err)
+			log.Fatalf("Error listing web5-spec commits: %v", err)
 		}
-		allCommits = append(allCommits, commits...)
+		allWeb5SpecCommits = append(allWeb5SpecCommits, commits...)
 		if resp.NextPage == 0 {
 			break
 		}
-		opt.Page = resp.NextPage
+		web5SpecOpt.Page = resp.NextPage
 	}
 
-	fmt.Println("All Web5-Spec Commits:")
-	for _, commit := range allCommits {
-		fmt.Println(*commit.SHA)
+	// Fetch commits for tbdex
+	tbdexOpt := &github.CommitsListOptions{
+		SHA: "main",
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	}
+
+	for {
+		commits, resp, err := gh.Repositories.ListCommits(ctx, "TBD54566975", "tbdex", tbdexOpt)
+		if err != nil {
+			log.Fatalf("Error listing tbdex commits: %v", err)
+		}
+		allTbdexCommits = append(allTbdexCommits, commits...)
+		if resp.NextPage == 0 {
+			break
+		}
+		tbdexOpt.Page = resp.NextPage
 	}
 
 	for _, sdk := range SDKs {
 		owner, repo, _ := strings.Cut(sdk.Repo, "/")
 
-		// Skip tbdex for now
+		// Determine the submodule path based on the SDK type
+		var submodulePath string
+		var allCommits []*github.RepositoryCommit
+
 		if sdk.Type == "tbdex" {
-			continue
+			submodulePath = "tbdex"
+			allCommits = allTbdexCommits
+		} else {
+			submodulePath = "web5-spec"
+			allCommits = allWeb5SpecCommits
 		}
 
-		// Get the current submodule commit for web5-spec in the SDK repo
-		submodulePath := "web5-spec" // The path where the submodule is located
+		// Get the current submodule commit for the SDK repo
 		submoduleFileContent, _, _, err := gh.Repositories.GetContents(ctx, owner, repo, submodulePath, nil)
 		if err != nil {
 			return fmt.Errorf("error getting submodule content for %s: %v", sdk.Repo, err)
 		}
 
 		submoduleCommitSHA := *submoduleFileContent.SHA
-		fmt.Printf("Current submodule commit for %s: %s \n", sdk.Repo, submoduleCommitSHA)
+		fmt.Printf("Current submodule commit for %s in %s: %s \n", submodulePath, sdk.Repo, submoduleCommitSHA)
 
 		// Check how far behind the submodule commit is from the allCommits
 		counter := 0
@@ -352,14 +375,14 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 		for _, commit := range allCommits {
 			counter++
 			if *commit.SHA == submoduleCommitSHA {
-				fmt.Printf("%s is behind by this many commits: %d \n", sdk.Repo, counter)
+				fmt.Printf("%s is behind by %d commits in %s \n", sdk.Repo, counter, submodulePath)
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			fmt.Printf("%s cannot how far behind with hash: %s \n", sdk.Repo, submoduleCommitSHA)
+			fmt.Printf("%s cannot determine how far behind with hash: %s in %s\n", sdk.Repo, submoduleCommitSHA, submodulePath)
 		}
 	}
 	return nil
