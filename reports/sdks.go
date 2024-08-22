@@ -18,94 +18,114 @@ import (
 var (
 	SDKs = []SDKMeta{
 		{
-			Name:         "web5-js",
-			Repo:         "TBD54566975/web5-js",
-			ArtifactName: "junit-results",
-			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`.* Web5TestVectors\w+ (\w+)`),
-			VectorPath:   "test-vectors",
-			Type:         "web5",
+			Name:                  "web5-js",
+			Repo:                  "TBD54566975/web5-js",
+			ArtifactName:          "junit-results",
+			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`.* Web5TestVectors\w+ (\w+)`),
+			VectorPath:            "test-vectors",
+			Type:                  "web5",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "web5-kt",
-			Repo:         "TBD54566975/web5-kt",
-			ArtifactName: "tests-report-junit",
-			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`(\w+)`),
-			VectorPath:   "test-vectors",
-			Type:         "web5",
+			Name:                  "web5-kt",
+			Repo:                  "TBD54566975/web5-kt",
+			ArtifactName:          "tests-report-junit",
+			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`(\w+)`),
+			VectorPath:            "test-vectors",
+			Type:                  "web5",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "web5-swift",
-			Repo:         "TBD54566975/web5-swift",
-			ArtifactName: "test-results",
-			FeatureRegex: regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`test_(\w+)`),
-			VectorPath:   "test-vectors",
-			Type:         "web5",
+			Name:                  "web5-swift",
+			Repo:                  "TBD54566975/web5-swift",
+			ArtifactName:          "test-results",
+			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`test_(\w+)`),
+			VectorPath:            "test-vectors",
+			Type:                  "web5",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "web5-rs",
-			Repo:         "TBD54566975/web5-rs",
-			ArtifactName: "rust-test-results",
-			FeatureRegex: regexp.MustCompile(`::(\w+)::(\w+)::(\w+)`),
-			VectorRegex:  regexp.MustCompile(`::(\w+)$`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "web5",
+			Name:                  "web5-rs",
+			Repo:                  "TBD54566975/web5-rs",
+			ArtifactName:          "rust-test-results",
+			FeatureRegex:          regexp.MustCompile(`::(\w+)::(\w+)::(\w+)`),
+			VectorRegex:           regexp.MustCompile(`::(\w+)$`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "web5",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "web5-core-kt",
-			Repo:         "TBD54566975/web5-rs",
-			ArtifactName: "kotlin-test-results",
-			FeatureRegex: regexp.MustCompile(`Web5TestVectorsTest\$Web5TestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`(\w+)`),
-			VectorPath:   "test-vectors",
-			Type:         "web5",
+			Name:                  "web5-core-kt",
+			Repo:                  "TBD54566975/web5-rs",
+			ArtifactName:          "kotlin-test-results",
+			FeatureRegex:          regexp.MustCompile(`Web5TestVectorsTest\$Web5TestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`(\w+)`),
+			VectorPath:            "test-vectors",
+			Type:                  "web5",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "tbdex-js",
-			Repo:         "TBD54566975/tbdex-js",
-			ArtifactName: "junit-results",
-			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`TbdexTestVectors(\w+) (\w+)`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "tbdex",
+			Name:                  "tbdex-js",
+			Repo:                  "TBD54566975/tbdex-js",
+			ArtifactName:          "junit-results",
+			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`TbdexTestVectors(\w+) (\w+)`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "tbdex",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "tbdex-kt",
-			Repo:         "TBD54566975/tbdex-kt",
-			ArtifactName: "tests-report-junit",
-			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`(\w+)`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "tbdex",
+			Name:                  "tbdex-kt",
+			Repo:                  "TBD54566975/tbdex-kt",
+			ArtifactName:          "tests-report-junit",
+			FeatureRegex:          regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`(\w+)`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "tbdex",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "tbdex-go",
-			Repo:         "TBD54566975/tbdex-go",
-			ArtifactName: "go-test-results",
-			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)`),
-			VectorRegex:  regexp.MustCompile(`TestAllParsers/(\w+)`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "tbdex",
+			Name:                  "tbdex-go",
+			Repo:                  "TBD54566975/tbdex-go",
+			ArtifactName:          "go-test-results",
+			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)`),
+			VectorRegex:           regexp.MustCompile(`TestAllParsers/(\w+)`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "tbdex",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "tbdex-rs",
-			Repo:         "TBD54566975/tbdex-rs",
-			ArtifactName: "rust-test-results",
-			FeatureRegex: regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
-			VectorRegex:  regexp.MustCompile(`::(\w+)$`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "tbdex",
+			Name:                  "tbdex-rs",
+			Repo:                  "TBD54566975/tbdex-rs",
+			ArtifactName:          "rust-test-results",
+			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
+			VectorRegex:           regexp.MustCompile(`::(\w+)$`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "tbdex",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 		{
-			Name:         "tbdex-core-kt",
-			Repo:         "TBD54566975/tbdex-rs",
-			ArtifactName: "kotlin-test-results",
-			FeatureRegex: regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
-			VectorRegex:  regexp.MustCompile(`(\w+)`),
-			VectorPath:   "tbdex-test-vectors",
-			Type:         "tbdex",
+			Name:                  "tbdex-core-kt",
+			Repo:                  "TBD54566975/tbdex-rs",
+			ArtifactName:          "kotlin-test-results",
+			FeatureRegex:          regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
+			VectorRegex:           regexp.MustCompile(`(\w+)`),
+			VectorPath:            "tbdex-test-vectors",
+			Type:                  "tbdex",
+			SubmoduleCommit:       "-", // Default value
+			SubmoduleCommitBehind: -1,  // Default value
 		},
 	}
 )
@@ -115,7 +135,7 @@ func GetAllReports() ([]Report, error) {
 
 	err := CheckSubmoduleStatus2(context.Background())
 	if err != nil {
-		fmt.Println("Error checking submodufle status: %v", err)
+		fmt.Println("Error checking submodule status: %v", err)
 	}
 
 	var reports []Report
