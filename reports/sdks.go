@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -151,6 +152,11 @@ func GetAllReports() ([]Report, error) {
 			fmt.Println("No Test Vector Suites found.")
 		}
 
+		err = CheckSubmoduleStatus(context.Background())
+		if err != nil {
+			log.Fatalf("Error checking submodule status: %v", err)
+		}
+
 		var report Report
 		if sdk.Name == "web5-rs" {
 			report, err = sdk.buildReportWeb5Rs(web5TestVectorSuites)
@@ -232,6 +238,64 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	slog.Info("downloaded artifact", "sdk", sdk.Repo, "size", len(artifact))
 
 	return artifact, nil
+}
+
+func CheckSubmoduleStatus(ctx context.Context) error {
+	for _, sdk := range SDKs {
+		owner, repo, _ := strings.Cut(sdk.Repo, "/")
+
+		// Determine submodule name based on SDK type
+		submoduleName := "web5-spec"
+		if sdk.Type == "tbdex" {
+			submoduleName = "tbdex"
+		}
+
+		// Get the current submodule commit
+		submoduleRef, _, err := gh.Git.GetRef(ctx, owner, repo, "heads/main")
+		if err != nil {
+			return fmt.Errorf("error getting ref for %s: %v", sdk.Repo, err)
+		}
+
+		tree, _, err := gh.Git.GetTree(ctx, owner, repo, *submoduleRef.Object.SHA, true)
+		if err != nil {
+			return fmt.Errorf("error getting tree for %s: %v", sdk.Repo, err)
+		}
+
+		var submoduleCommit string
+		for _, entry := range tree.Entries {
+			if *entry.Path == submoduleName {
+				submoduleCommit = *entry.SHA
+				break
+			}
+		}
+
+		if submoduleCommit == "" {
+			return fmt.Errorf("submodule %s not found in %s", submoduleName, sdk.Repo)
+		}
+
+		// Get the latest commit of the submodule repo
+		submoduleOwner := "TBD54566975"
+		submoduleRepo := submoduleName
+		latestCommit, _, err := gh.Repositories.GetCommit(ctx, submoduleOwner, submoduleRepo, "main", nil)
+		if err != nil {
+			return fmt.Errorf("error getting latest commit for %s: %v", submoduleRepo, err)
+		}
+
+		// Compare commits
+		comparison, _, err := gh.Repositories.CompareCommits(ctx, submoduleOwner, submoduleRepo, submoduleCommit, *latestCommit.SHA, nil)
+		if err != nil {
+			return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
+		}
+
+		fmt.Printf("Repo: %s\n", sdk.Repo)
+		fmt.Printf("Submodule: %s\n", submoduleName)
+		fmt.Printf("Current commit: %s\n", submoduleCommit[:7])
+		fmt.Printf("Latest commit: %s\n", (*latestCommit.SHA)[:7])
+		fmt.Printf("Commits behind: %d\n", comparison.BehindBy)
+		fmt.Println("--------------------")
+	}
+
+	return nil
 }
 
 // Used for testing purposes
