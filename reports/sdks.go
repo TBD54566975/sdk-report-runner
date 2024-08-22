@@ -15,125 +15,103 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var (
-	SDKs = []SDKMeta{
-		{
-			Name:                  "web5-js",
-			Repo:                  "TBD54566975/web5-js",
-			ArtifactName:          "junit-results",
-			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`.* Web5TestVectors\w+ (\w+)`),
-			VectorPath:            "test-vectors",
-			Type:                  "web5",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "web5-kt",
-			Repo:                  "TBD54566975/web5-kt",
-			ArtifactName:          "tests-report-junit",
-			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`(\w+)`),
-			VectorPath:            "test-vectors",
-			Type:                  "web5",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "web5-swift",
-			Repo:                  "TBD54566975/web5-swift",
-			ArtifactName:          "test-results",
-			FeatureRegex:          regexp.MustCompile(`Web5TestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`test_(\w+)`),
-			VectorPath:            "test-vectors",
-			Type:                  "web5",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "web5-rs",
-			Repo:                  "TBD54566975/web5-rs",
-			ArtifactName:          "rust-test-results",
-			FeatureRegex:          regexp.MustCompile(`::(\w+)::(\w+)::(\w+)`),
-			VectorRegex:           regexp.MustCompile(`::(\w+)$`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "web5",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "web5-core-kt",
-			Repo:                  "TBD54566975/web5-rs",
-			ArtifactName:          "kotlin-test-results",
-			FeatureRegex:          regexp.MustCompile(`Web5TestVectorsTest\$Web5TestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`(\w+)`),
-			VectorPath:            "test-vectors",
-			Type:                  "web5",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "tbdex-js",
-			Repo:                  "TBD54566975/tbdex-js",
-			ArtifactName:          "junit-results",
-			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`TbdexTestVectors(\w+) (\w+)`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "tbdex",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "tbdex-kt",
-			Repo:                  "TBD54566975/tbdex-kt",
-			ArtifactName:          "tests-report-junit",
-			FeatureRegex:          regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`(\w+)`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "tbdex",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "tbdex-go",
-			Repo:                  "TBD54566975/tbdex-go",
-			ArtifactName:          "go-test-results",
-			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)`),
-			VectorRegex:           regexp.MustCompile(`TestAllParsers/(\w+)`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "tbdex",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "tbdex-rs",
-			Repo:                  "TBD54566975/tbdex-rs",
-			ArtifactName:          "rust-test-results",
-			FeatureRegex:          regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
-			VectorRegex:           regexp.MustCompile(`::(\w+)$`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "tbdex",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-		{
-			Name:                  "tbdex-core-kt",
-			Repo:                  "TBD54566975/tbdex-rs",
-			ArtifactName:          "kotlin-test-results",
-			FeatureRegex:          regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
-			VectorRegex:           regexp.MustCompile(`(\w+)`),
-			VectorPath:            "tbdex-test-vectors",
-			Type:                  "tbdex",
-			SubmoduleCommit:       "-", // Default value
-			SubmoduleCommitBehind: -1,  // Default value
-		},
-	}
-)
+var SDKs = []SDKMeta{
+	NewSDKMeta(
+		"web5-js",
+		"TBD54566975/web5-js",
+		"junit-results",
+		"test-vectors",
+		"web5",
+		regexp.MustCompile(`Web5TestVectors(\w+)`),
+		regexp.MustCompile(`.* Web5TestVectors\w+ (\w+)`),
+	),
+	NewSDKMeta(
+		"web5-kt",
+		"TBD54566975/web5-kt",
+		"tests-report-junit",
+		"test-vectors",
+		"web5",
+		regexp.MustCompile(`Web5TestVectors(\w+)`),
+		regexp.MustCompile(`(\w+)`),
+	),
+	NewSDKMeta(
+		"web5-swift",
+		"TBD54566975/web5-swift",
+		"test-results",
+		"test-vectors",
+		"web5",
+		regexp.MustCompile(`Web5TestVectors(\w+)`),
+		regexp.MustCompile(`test_(\w+)`),
+	),
+	NewSDKMeta(
+		"web5-rs",
+		"TBD54566975/web5-rs",
+		"rust-test-results",
+		"tbdex-test-vectors",
+		"web5",
+		regexp.MustCompile(`::(\w+)::(\w+)::(\w+)`),
+		regexp.MustCompile(`::(\w+)$`),
+	),
+	NewSDKMeta(
+		"web5-core-kt",
+		"TBD54566975/web5-rs",
+		"kotlin-test-results",
+		"test-vectors",
+		"web5",
+		regexp.MustCompile(`Web5TestVectorsTest\$Web5TestVectors(\w+)`),
+		regexp.MustCompile(`(\w+)`),
+	),
+	NewSDKMeta(
+		"tbdex-js",
+		"TBD54566975/tbdex-js",
+		"junit-results",
+		"tbdex-test-vectors",
+		"tbdex",
+		regexp.MustCompile(`TbdexTestVectors(\w+)`),
+		regexp.MustCompile(`TbdexTestVectors(\w+) (\w+)`),
+	),
+	NewSDKMeta(
+		"tbdex-kt",
+		"TBD54566975/tbdex-kt",
+		"tests-report-junit",
+		"tbdex-test-vectors",
+		"tbdex",
+		regexp.MustCompile(`tbdex\.sdk\.\w+.TbdexTestVectors(\w+)`),
+		regexp.MustCompile(`(\w+)`),
+	),
+	NewSDKMeta(
+		"tbdex-go",
+		"TBD54566975/tbdex-go",
+		"go-test-results",
+		"tbdex-test-vectors",
+		"tbdex",
+		regexp.MustCompile(`TbdexTestVectors(\w+)`),
+		regexp.MustCompile(`TestAllParsers/(\w+)`),
+	),
+	NewSDKMeta(
+		"tbdex-rs",
+		"TBD54566975/tbdex-rs",
+		"rust-test-results",
+		"tbdex-test-vectors",
+		"tbdex",
+		regexp.MustCompile(`TbdexTestVectors(\w+)Test`),
+		regexp.MustCompile(`::(\w+)$`),
+	),
+	NewSDKMeta(
+		"tbdex-core-kt",
+		"TBD54566975/tbdex-rs",
+		"kotlin-test-results",
+		"tbdex-test-vectors",
+		"tbdex",
+		regexp.MustCompile(`tbdex\.sdk\.\w+\.TbdexTestVectors(\w+)Test`),
+		regexp.MustCompile(`(\w+)`),
+	),
+}
 
 func GetAllReports() ([]Report, error) {
 	ctx := context.Background()
 
-	err := CheckSubmoduleStatus2(context.Background())
+	err := CheckSubmoduleStatus(context.Background())
 	if err != nil {
 		fmt.Println("Error checking submodule status: %v", err)
 	}
@@ -262,66 +240,7 @@ func downloadArtifact(ctx context.Context, sdk SDKMeta) ([]byte, error) {
 	return artifact, nil
 }
 
-//	func CheckSubmoduleStatus(ctx context.Context) error {
-//		for _, sdk := range SDKs {
-//			owner, repo, _ := strings.Cut(sdk.Repo, "/")
-//
-//			// Determine submodule name based on SDK type
-//			submoduleName := "web5-spec"
-//			if sdk.Type == "tbdex" {
-//				submoduleName = "tbdex"
-//			}
-//
-//			// Get the current submodule commit
-//			submoduleRef, _, err := gh.Git.GetRef(ctx, owner, repo, "heads/main")
-//			if err != nil {
-//				return fmt.Errorf("error getting ref for %s: %v", sdk.Repo, err)
-//			}
-//
-//			tree, _, err := gh.Git.GetTree(ctx, owner, repo, *submoduleRef.Object.SHA, true)
-//			if err != nil {
-//				return fmt.Errorf("error getting tree for %s: %v", sdk.Repo, err)
-//			}
-//
-//			var submoduleCommit string
-//			for _, entry := range tree.Entries {
-//				if *entry.Path == submoduleName {
-//					submoduleCommit = *entry.SHA
-//					break
-//				}
-//			}
-//
-//			if submoduleCommit == "" {
-//				fmt.Printf("submodule %s not found in %s\n", submoduleName, sdk.Repo)
-//				continue
-//			}
-//
-//			// Get the latest commit of the submodule repo
-//			submoduleOwner := "TBD54566975"
-//			submoduleRepo := submoduleName
-//			latestCommit, _, err := gh.Repositories.GetCommit(ctx, submoduleOwner, submoduleRepo, "main", nil)
-//			if err != nil {
-//				return fmt.Errorf("error getting latest commit for %s: %v", submoduleRepo, err)
-//			}
-//
-//			// Compare commits
-//			comparison, _, err := gh.Repositories.CompareCommits(ctx, submoduleOwner, submoduleRepo, submoduleCommit, *latestCommit.SHA, nil)
-//			if err != nil {
-//				return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
-//			}
-//
-//			slog.Info("Submodule status",
-//				"repo", sdk.Repo,
-//				"submodule", submoduleName,
-//				"current_commit", submoduleCommit[:7],
-//				"latest_commit", (*latestCommit.SHA)[:7],
-//				"commits_behind", *comparison.BehindBy)
-//			slog.Info("--------------------")
-//		}
-//
-//		return nil
-//	}
-func CheckSubmoduleStatus2(ctx context.Context) error {
+func CheckSubmoduleStatus(ctx context.Context) error {
 	var allWeb5SpecCommits []*github.RepositoryCommit
 	var allTbdexCommits []*github.RepositoryCommit
 
@@ -367,7 +286,7 @@ func CheckSubmoduleStatus2(ctx context.Context) error {
 
 	// Iterate using index to modify the original SDKMeta in the slice
 	for i := range SDKs {
-		sdk := &SDKs[i] // Get the pointer to the current SDKMeta in the slice
+		sdk := &SDKs[i]
 
 		// default values
 		sdk.SubmoduleCommit = "-"

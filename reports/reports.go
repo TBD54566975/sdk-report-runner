@@ -42,6 +42,20 @@ type SDKMeta struct {
 	SubmoduleCommitBehind int
 }
 
+func NewSDKMeta(name, repo, artifactName, vectorPath, sdkType string, featureRegex, vectorRegex *regexp.Regexp) SDKMeta {
+	return SDKMeta{
+		Name:                  name,
+		Repo:                  repo,
+		ArtifactName:          artifactName,
+		FeatureRegex:          featureRegex,
+		VectorRegex:           vectorRegex,
+		VectorPath:            vectorPath,
+		Type:                  sdkType,
+		SubmoduleCommit:       "-",
+		SubmoduleCommitBehind: -1,
+	}
+}
+
 type Report struct {
 	SDK     SDKMeta
 	Results map[string]map[string]Result
