@@ -31,13 +31,15 @@ func init() {
 }
 
 type SDKMeta struct {
-	Name         string
-	Repo         string
-	ArtifactName string
-	FeatureRegex *regexp.Regexp
-	VectorRegex  *regexp.Regexp
-	VectorPath   string
-	Type         string
+	Name                  string
+	Repo                  string
+	ArtifactName          string
+	FeatureRegex          *regexp.Regexp
+	VectorRegex           *regexp.Regexp
+	VectorPath            string
+	Type                  string
+	SubmoduleCommit       string
+	SubmoduleCommitBehind int
 }
 
 type Report struct {
