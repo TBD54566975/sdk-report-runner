@@ -292,7 +292,7 @@ func CheckSubmoduleStatus(ctx context.Context) error {
 			"submodule", submoduleName,
 			"current_commit", submoduleCommit[:7],
 			"latest_commit", (*latestCommit.SHA)[:7],
-			"commits_behind", comparison.BehindBy)
+			"commits_behind", *comparison.BehindBy)
 		slog.Info("--------------------")
 	}
 
