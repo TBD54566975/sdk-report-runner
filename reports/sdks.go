@@ -287,11 +287,12 @@ func CheckSubmoduleStatus(ctx context.Context) error {
 			return fmt.Errorf("error comparing commits for %s: %v", submoduleRepo, err)
 		}
 
-		slog.Info("Repo: %s\n", sdk.Repo)
-		slog.Info("Submodule: %s\n", submoduleName)
-		slog.Info("Current commit: %s\n", submoduleCommit[:7])
-		slog.Info("Latest commit: %s\n", (*latestCommit.SHA)[:7])
-		slog.Info("Commits behind: %d\n", comparison.BehindBy)
+		slog.Info("Submodule status",
+			"repo", sdk.Repo,
+			"submodule", submoduleName,
+			"current_commit", submoduleCommit[:7],
+			"latest_commit", (*latestCommit.SHA)[:7],
+			"commits_behind", comparison.BehindBy)
 		slog.Info("--------------------")
 	}
 
