@@ -31,13 +31,29 @@ func init() {
 }
 
 type SDKMeta struct {
-	Name         string
-	Repo         string
-	ArtifactName string
-	FeatureRegex *regexp.Regexp
-	VectorRegex  *regexp.Regexp
-	VectorPath   string
-	Type         string
+	Name                  string
+	Repo                  string
+	ArtifactName          string
+	FeatureRegex          *regexp.Regexp
+	VectorRegex           *regexp.Regexp
+	VectorPath            string
+	Type                  string
+	SubmoduleCommit       string
+	SubmoduleCommitBehind int
+}
+
+func NewSDKMeta(name, repo, artifactName, vectorPath, sdkType string, featureRegex, vectorRegex *regexp.Regexp) SDKMeta {
+	return SDKMeta{
+		Name:                  name,
+		Repo:                  repo,
+		ArtifactName:          artifactName,
+		FeatureRegex:          featureRegex,
+		VectorRegex:           vectorRegex,
+		VectorPath:            vectorPath,
+		Type:                  sdkType,
+		SubmoduleCommit:       "-",
+		SubmoduleCommitBehind: -1,
+	}
 }
 
 type Report struct {

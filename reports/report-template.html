@@ -109,6 +109,37 @@
         {{ end }}
       </table>
       {{ end }}
+
+      <hr/>
+      <h1>SDK Repository Submodule Information</h1>
+      <table>
+        <thead>
+        <tr>
+          <th>SDK</th>
+          <th>Repository</th>
+          <th>Submodule Commit</th>
+          <th>Commits Behind</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $.Web5Reports }}
+        <tr>
+          <td>{{ .SDK.Name }}</td>
+          <td><a href="https://github.com/{{ .SDK.Repo }}" target="_blank">{{ .SDK.Repo }}</a></td>
+          <td>{{ .SDK.SubmoduleCommit }}</td>
+          <td>{{ .SDK.SubmoduleCommitBehind }}</td>
+        </tr>
+        {{ end }}
+        {{ range $.TbdexReports }}
+        <tr>
+          <td>{{ .SDK.Name }}</td>
+          <td><a href="https://github.com/{{ .SDK.Repo }}" target="_blank">{{ .SDK.Repo }}</a></td>
+          <td>{{ .SDK.SubmoduleCommit }}</td>
+          <td>{{ .SDK.SubmoduleCommitBehind }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+      </table>
       <!-- Display creation time at the bottom of the page -->
       <div style="text-align: center; margin-top: 20px;">
         <strong>Report generated on: {{ .CreationTime }}</strong>
