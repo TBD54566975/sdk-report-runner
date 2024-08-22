@@ -152,7 +152,7 @@ func GetAllReports() ([]Report, error) {
 			fmt.Println("No Test Vector Suites found.")
 		}
 
-		err = CheckSubmoduleStatus(context.Background())
+		err = CheckSubmoduleStatus2(context.Background())
 		if err != nil {
 			fmt.Println("Error checking submodule status: %v", err)
 		}
