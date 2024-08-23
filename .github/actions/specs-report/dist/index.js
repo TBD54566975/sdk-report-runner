@@ -38710,10 +38710,10 @@ const addFailedVectorsSection = (failedVectors, parentDir) => {
                 { data: 'Failure Message', header: true }
             ];
             const failedTestsRows = vector.testCases
-                .filter(testCase => testCase.failure)
+                .filter(testCase => testCase.failure || testCase.error)
                 .map(testCase => [
                 testCase.name ?? 'Unnamed test',
-                failureToMessageRows(testCase.failure ?? [])
+                failureToMessageRows(testCase.error ?? testCase.failure ?? [])
             ]);
             core.summary.addTable([failedTestsHeaderRow, ...failedTestsRows]);
         }
@@ -38774,8 +38774,9 @@ const failureToMessageRows = (failure) => {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-        return `<b>${detail.message}</b><br/><pre>${escapedInnerHTML || 'Unknown error'}\n</pre>`;
+            .replace(/'/g, '&#039;')
+            .substring(0, 128);
+        return `<b>${detail.message}</b><br/><pre>${escapedInnerHTML || 'Unknown error'}...\n</pre>`;
     })
         .join('<br>\n');
 };
