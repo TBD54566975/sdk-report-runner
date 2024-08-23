@@ -19,7 +19,7 @@ export const SUCCESS_MOCK = {
     skippedVectors: [],
     successVectors: [
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_balance',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-balance.json',
         testCases: [
@@ -31,7 +31,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_cancel',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-cancel.json',
         testCases: [
@@ -43,7 +43,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_close',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-close.json',
         testCases: [
@@ -55,7 +55,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_offering',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-offering.json',
         testCases: [
@@ -67,7 +67,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_order',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-order.json',
         testCases: [
@@ -79,7 +79,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_orderinstructions',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-orderinstructions.json',
         testCases: [
@@ -91,7 +91,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_orderstatus',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-orderstatus.json',
         testCases: [
@@ -103,7 +103,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_quote',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-quote.json',
         testCases: [
@@ -115,7 +115,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_rfq_omit_private_data',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-rfq-omit-private-data.json',
         testCases: [
@@ -127,7 +127,7 @@ export const SUCCESS_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_rfq',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-rfq.json',
         testCases: [
@@ -147,13 +147,13 @@ export const FAILURE_MOCK = {
   vectors: {
     missingVectors: [
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_close',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-close.json',
         testCases: []
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_offering',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-offering.json',
         testCases: []
@@ -161,7 +161,7 @@ export const FAILURE_MOCK = {
     ],
     failedVectors: [
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_cancel',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-cancel.json',
         testCases: [
@@ -184,7 +184,7 @@ export const FAILURE_MOCK = {
     skippedVectors: [],
     successVectors: [
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_balance',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-balance.json',
         testCases: [
@@ -196,7 +196,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_order',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-order.json',
         testCases: [
@@ -208,7 +208,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_orderinstructions',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-orderinstructions.json',
         testCases: [
@@ -220,7 +220,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_orderstatus',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-orderstatus.json',
         testCases: [
@@ -232,7 +232,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_quote',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-quote.json',
         testCases: [
@@ -244,7 +244,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_rfq_omit_private_data',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-rfq-omit-private-data.json',
         testCases: [
@@ -256,7 +256,7 @@ export const FAILURE_MOCK = {
         ]
       },
       {
-        category: 'protocol',
+        feature: 'Protocol',
         name: 'parse_rfq',
         file: '/home/runner/work/tbdex-js/tbdex-js/tbdex/hosted/test-vectors/protocol/vectors/parse-rfq.json',
         testCases: [

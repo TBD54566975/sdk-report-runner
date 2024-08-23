@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import { SuiteRegexStrFilters } from './test-vectors'
 
 /**
  * Inputs for the action.
@@ -8,8 +9,8 @@ export interface ActionInputs {
   junitReportPaths: string
   /** The path to the spec files */
   specPath: string
-  /** The prefix of the test cases to be filtered */
-  testCasesPrefix: string
+  /** The regex filters for the test suite name, spec feature, and spec vector name */
+  suiteRegexStrFilters: SuiteRegexStrFilters
   /** The GitHub token to use for adding a comment to the PR */
   gitToken: string
   /** Whether to add the report as a comment to the PR */
@@ -29,7 +30,12 @@ export const readActionInputs = (): ActionInputs => {
     required: true
   })
   const specPath = core.getInput('spec-path', { required: true })
-  const testCasesPrefix = core.getInput('test-cases-prefix')
+  // Fallback to the default tbdex-js regex filters if not provided
+  const suiteRegexStrFilters = {
+    suiteName: core.getInput('suite-name-regex') || 'TbdexTestVector',
+    feature: core.getInput('feature-regex') || 'TbdexTestVectors(\\w+)',
+    vector: core.getInput('vector-regex') || 'TbdexTestVectors(\\w+) (\\w+)'
+  }
   const gitToken = core.getInput('git-token')
   const commentOnPr = core.getInput('comment-on-pr') === 'true'
   const failOnMissingVectors =
@@ -39,7 +45,7 @@ export const readActionInputs = (): ActionInputs => {
   return {
     junitReportPaths,
     specPath,
-    testCasesPrefix,
+    suiteRegexStrFilters,
     gitToken,
     commentOnPr,
     failOnMissingVectors,

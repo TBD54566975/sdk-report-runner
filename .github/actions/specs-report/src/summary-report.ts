@@ -84,7 +84,7 @@ const addFailedVectorsSection = (
     core.summary.addRaw('These are test vectors with test cases that failed.')
     for (const vector of failedVectors) {
       core.info(`Failed vector: ${JSON.stringify(vector, null, 2)}`)
-      core.summary.addHeading(`${vector.category}: ${vector.name}`, 4)
+      core.summary.addHeading(`${vector.feature}: ${vector.name}`, 4)
       const relativeFilePath = vector.file.replace(parentDir, '')
       core.summary.addRaw(`File: ${relativeFilePath}\n\n`)
 
@@ -110,10 +110,10 @@ const addMissingVectorsSection = (missingVectors: TestVector[]): void => {
     core.summary.addRaw('These are test vectors without any test cases.')
     const missingVectorsTable = [
       [
-        { data: 'Category', header: true },
+        { data: 'Feature', header: true },
         { data: 'Name', header: true }
       ],
-      ...missingVectors.map(vector => [vector.category, vector.name])
+      ...missingVectors.map(vector => [vector.feature, vector.name])
     ]
     core.summary.addTable(missingVectorsTable)
   }
@@ -129,7 +129,7 @@ const addSkippedVectorsSection = (
       'These are test vectors with test cases that are set to skip.'
     )
     for (const vector of skippedVectors) {
-      core.summary.addHeading(`${vector.category}: ${vector.name}`, 3)
+      core.summary.addHeading(`${vector.feature}: ${vector.name}`, 3)
       const relativeFilePath = vector.file.replace(parentDir, '')
       core.summary.addRaw(`<code>File: ${relativeFilePath}</code>\n\n`)
 

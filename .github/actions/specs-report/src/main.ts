@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
     const {
       junitReportPaths,
       specPath,
-      testCasesPrefix,
+      suiteRegexStrFilters,
       gitToken,
       commentOnPr,
       failOnMissingVectors,
@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
     const report = await buildTestVectorReport(
       specPath,
       reportFiles,
-      testCasesPrefix
+      suiteRegexStrFilters
     )
 
     const summary = generateSummary(report)

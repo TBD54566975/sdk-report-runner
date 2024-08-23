@@ -34,6 +34,12 @@ const defaultGetInputMockImplementation = (): void => {
     switch (name) {
       case 'junit-report-paths':
         return '500'
+      case 'suite-name-regex':
+        return 'TbdexTestVector' // or 'Web5TestVector' for Web5
+      case 'feature-regex':
+        return 'TbdexTestVectors(\\w+)'
+      case 'vector-regex':
+        return 'TbdexTestVectors(\\w+) (\\w+)'
       case 'spec-path':
         return '500'
       case 'git-token':
@@ -122,7 +128,6 @@ describe('action', () => {
       specSkippedTestCases: 0,
       ...SUCCESS_MOCK.vectors
     }
-    console.info(output['test-vector-report'])
     const testVectorReport = JSON.parse(output['test-vector-report'])
     expect(testVectorReport).toEqual(expectedReport)
   })
@@ -144,7 +149,6 @@ describe('action', () => {
     expect(junitParseMock).toHaveReturnedTimes(1)
     expect(junitParseMock).toHaveBeenCalledWith(rawJunitFile)
 
-    console.info({ output })
     expect(setOutputMock).toHaveBeenCalled()
     expect(output.success).not.toBeDefined()
     expect(setFailedMock).toHaveBeenCalledWith('❌ Failed test vectors found')
@@ -165,7 +169,6 @@ describe('action', () => {
       specSkippedTestCases: 0,
       ...FAILURE_MOCK.vectors
     }
-    console.info(output['test-vector-report'])
     const testVectorReport = JSON.parse(output['test-vector-report'])
     expect(testVectorReport).toEqual(expectedReport)
   })

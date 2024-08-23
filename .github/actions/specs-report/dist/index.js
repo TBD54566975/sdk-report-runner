@@ -38297,7 +38297,12 @@ const readActionInputs = () => {
         required: true
     });
     const specPath = core.getInput('spec-path', { required: true });
-    const testCasesPrefix = core.getInput('test-cases-prefix');
+    // Fallback to the default tbdex-js regex filters if not provided
+    const suiteRegexStrFilters = {
+        suiteName: core.getInput('suite-name-regex') || 'TbdexTestVector',
+        feature: core.getInput('feature-regex') || 'TbdexTestVectors(\\w+)',
+        vector: core.getInput('vector-regex') || 'TbdexTestVectors(\\w+) (\\w+)'
+    };
     const gitToken = core.getInput('git-token');
     const commentOnPr = core.getInput('comment-on-pr') === 'true';
     const failOnMissingVectors = core.getInput('fail-on-missing-vectors') === 'true';
@@ -38305,7 +38310,7 @@ const readActionInputs = () => {
     return {
         junitReportPaths,
         specPath,
-        testCasesPrefix,
+        suiteRegexStrFilters,
         gitToken,
         commentOnPr,
         failOnMissingVectors,
@@ -38406,17 +38411,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseJunitTestCases = void 0;
+exports.parseJunitTestSuites = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const junit2json = __importStar(__nccwpck_require__(3099));
 const files_1 = __nccwpck_require__(7255);
 /**
- * Parses the JUnit XML files
+ * Extracts test suites from JUnit XML files
  * @param reportFiles - An array of file paths.
  */
-const parseJunitTestCases = async (reportFiles) => {
+const parseJunitTestSuites = async (reportFiles) => {
     core.info(`Parsing JUnit XML files: ${reportFiles.join(', ')}`);
-    const junitTestCases = [];
+    const testSuites = [];
     for (const file of reportFiles) {
         const fileContent = (0, files_1.readFile)(file);
         core.debug(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`);
@@ -38426,19 +38431,18 @@ const parseJunitTestCases = async (reportFiles) => {
             throw new Error(`Failed to parse JUnit XML file: ${file}`);
         }
         if ('testsuite' in junit) {
-            const testCases = junit.testsuite?.flatMap(testSuite => testSuite.testcase || []) || [];
-            junitTestCases.push(...testCases);
+            testSuites.push(...(junit.testsuite || []));
         }
         else if ('testcase' in junit && junit.testcase) {
-            junitTestCases.push(...junit.testcase);
+            testSuites.push(junit);
         }
         else {
             throw new Error(`Failed to get testcases from JUnit XML file: ${file}\n${JSON.stringify(junit)}`);
         }
     }
-    return junitTestCases;
+    return testSuites;
 };
-exports.parseJunitTestCases = parseJunitTestCases;
+exports.parseJunitTestSuites = parseJunitTestSuites;
 
 
 /***/ }),
@@ -38484,9 +38488,9 @@ const pr_comment_1 = __nccwpck_require__(604);
  */
 async function run() {
     try {
-        const { junitReportPaths, specPath, testCasesPrefix, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = (0, action_inputs_1.readActionInputs)();
+        const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = (0, action_inputs_1.readActionInputs)();
         const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
-        const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, testCasesPrefix);
+        const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
         const summary = (0, summary_report_1.generateSummary)(report);
         if (commentOnPr) {
             await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
@@ -38698,7 +38702,7 @@ const addFailedVectorsSection = (failedVectors, parentDir) => {
         core.summary.addRaw('These are test vectors with test cases that failed.');
         for (const vector of failedVectors) {
             core.info(`Failed vector: ${JSON.stringify(vector, null, 2)}`);
-            core.summary.addHeading(`${vector.category}: ${vector.name}`, 4);
+            core.summary.addHeading(`${vector.feature}: ${vector.name}`, 4);
             const relativeFilePath = vector.file.replace(parentDir, '');
             core.summary.addRaw(`File: ${relativeFilePath}\n\n`);
             const failedTestsHeaderRow = [
@@ -38722,10 +38726,10 @@ const addMissingVectorsSection = (missingVectors) => {
         core.summary.addRaw('These are test vectors without any test cases.');
         const missingVectorsTable = [
             [
-                { data: 'Category', header: true },
+                { data: 'Feature', header: true },
                 { data: 'Name', header: true }
             ],
-            ...missingVectors.map(vector => [vector.category, vector.name])
+            ...missingVectors.map(vector => [vector.feature, vector.name])
         ];
         core.summary.addTable(missingVectorsTable);
     }
@@ -38735,7 +38739,7 @@ const addSkippedVectorsSection = (skippedVectors, parentDir) => {
         core.summary.addHeading(`⚠️ Skipped Vectors (${skippedVectors.length})`, 3);
         core.summary.addRaw('These are test vectors with test cases that are set to skip.');
         for (const vector of skippedVectors) {
-            core.summary.addHeading(`${vector.category}: ${vector.name}`, 3);
+            core.summary.addHeading(`${vector.feature}: ${vector.name}`, 3);
             const relativeFilePath = vector.file.replace(parentDir, '');
             core.summary.addRaw(`<code>File: ${relativeFilePath}</code>\n\n`);
             const skippedTests = vector.testCases
@@ -38816,7 +38820,7 @@ const junit_handler_1 = __nccwpck_require__(1886);
  * Parses the test vector results from the JUnit XML files against the
  * test vectors located in the spec path glob pattern.
  */
-const buildTestVectorReport = async (specPath, reportFiles, testCasesPrefix) => {
+const buildTestVectorReport = async (specPath, reportFiles, suiteRegex) => {
     const testVectors = await getTestVectors(specPath);
     const testVectorReport = {
         totalJunitFiles: reportFiles.length,
@@ -38831,8 +38835,8 @@ const buildTestVectorReport = async (specPath, reportFiles, testCasesPrefix) => 
         skippedVectors: [],
         successVectors: []
     };
-    const junitTestCases = await (0, junit_handler_1.parseJunitTestCases)(reportFiles);
-    const { totalJunitTestCases, totalSpecTestCases } = addJunitToVectorsTestCases(junitTestCases, testVectors, testCasesPrefix);
+    const junitTestSuites = await (0, junit_handler_1.parseJunitTestSuites)(reportFiles);
+    const { totalJunitTestCases, totalSpecTestCases } = addJunitToVectorsTestCases(junitTestSuites, testVectors, suiteRegex);
     testVectorReport.totalJunitTestCases = totalJunitTestCases;
     testVectorReport.specTestCases = totalSpecTestCases;
     core.info(`JUnit test cases parsed!\n${JSON.stringify({ totalJunitTestCases, totalSpecTestCases }, null, 2)}`);
@@ -38907,13 +38911,16 @@ const mapTestVectorFile = (file) => {
     let fileFolderName = fileFullPath.pop();
     if (fileFolderName === 'vectors') {
         // ignore the vectors folder to get the parent folder name
-        // eg. .../protocol/vectors/parse-balance.json category = protocol
+        // eg. .../protocol/vectors/parse-balance.json, feature = protocol
         fileFolderName = fileFullPath.pop();
     }
-    const category = fileFolderName?.replace(/-/g, '_').toLowerCase() || '';
+    const feature = fileFolderName
+        ?.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('') || '';
     const name = fileName.split('.')[0].replace(/-/g, '_').toLowerCase();
     const testVector = {
-        category,
+        feature,
         name,
         file,
         testCases: []
@@ -38921,35 +38928,54 @@ const mapTestVectorFile = (file) => {
     core.info(`Test vector: ${JSON.stringify(testVector)}`);
     return testVector;
 };
-const addJunitToVectorsTestCases = (junitTestCases, testVectors, testCasesPrefix) => {
-    const totalJunitTestCases = junitTestCases.length;
+const addJunitToVectorsTestCases = (junitTestSuites, testVectors, suiteRegex) => {
+    let totalJunitTestCases = 0;
     let totalSpecTestCases = 0;
-    for (const testCase of junitTestCases) {
-        if (testCasesPrefix && !testCase.name?.startsWith(testCasesPrefix))
+    const suiteNameString = new RegExp(suiteRegex.suiteName);
+    const featureRegex = new RegExp(suiteRegex.feature);
+    const vectorRegex = new RegExp(suiteRegex.vector);
+    for (const testSuite of junitTestSuites) {
+        totalJunitTestCases += testSuite.testcase?.length ?? 0;
+        if (!testSuite.testcase ||
+            !testSuite.name ||
+            !suiteNameString.test(testSuite.name))
             continue;
-        // check if testcase is relevant to any test vector key
-        const testVector = testVectors.find(vector => {
-            const vectorCategoryName = vector.category.toLowerCase();
-            const vectorCategoryNameClean = vectorCategoryName.replace(/[-_\s]/g, '');
-            const testCaseName = testCase.name?.toLowerCase() || '';
-            const testCaseNameWords = testCaseName.split(' ');
-            const testCaseClassName = testCase.classname?.toLowerCase() || '';
-            return (
-            // test case has the same name as the test vector
-            testCaseNameWords.find(word => word === vector.name) &&
-                // and test case contains the test vector category
-                (testCaseName.includes(vectorCategoryName) ||
-                    testCaseName.includes(vectorCategoryNameClean) ||
-                    // or test case class name contains the test vector category
-                    testCaseClassName.includes(vectorCategoryName) ||
-                    testCaseClassName.includes(vectorCategoryNameClean)));
-        });
-        if (!testVector)
+        const feature = extractFeature(testSuite.name, featureRegex);
+        if (!feature)
             continue;
-        testVector.testCases.push(testCase);
-        totalSpecTestCases++;
+        for (const testCase of testSuite.testcase) {
+            if (!testCase.name)
+                continue;
+            const vectorName = extractTestName(testCase.name, vectorRegex);
+            if (!vectorName)
+                continue;
+            const testVector = testVectors.find(vector => vector.feature === feature && vector.name === vectorName);
+            if (testVector) {
+                testVector.testCases.push(testCase);
+                totalSpecTestCases++;
+            }
+            else {
+                core.warning(`Test vector not found: ${feature}/${vectorName} `);
+            }
+        }
     }
     return { totalJunitTestCases, totalSpecTestCases };
+};
+const extractFeature = (input, featureRegex) => {
+    const matches = featureRegex.exec(input);
+    // If a match is found, it will be in the second element of the 'matches' array.
+    if (matches && matches.length >= 2) {
+        return matches[1];
+    }
+    return '';
+};
+const extractTestName = (input, testRegex) => {
+    const matches = testRegex.exec(input);
+    if (matches && matches.length > 0) {
+        // If a match is found, it will be in the last element.
+        return matches[matches.length - 1];
+    }
+    return '';
 };
 
 

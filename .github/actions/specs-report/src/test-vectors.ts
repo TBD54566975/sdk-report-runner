@@ -1,11 +1,11 @@
 import * as core from '@actions/core'
 
 import { getFiles, readJsonFile } from './files'
-import { parseJunitTestCases, TestCase } from './junit-handler'
+import { parseJunitTestSuites, TestCase, TestSuite } from './junit-handler'
 
 export interface TestVector {
-  /** The category of the test vector */
-  category: string
+  /** The feature of the test vector */
+  feature: string
   /** The name of the test vector */
   name: string
   /** The file path of the test vector */
@@ -40,13 +40,22 @@ export interface TestVectorReport {
 }
 
 /**
+ * The regex filters for the test suite name, spec feature, and spec vector name.
+ */
+export interface SuiteRegexStrFilters {
+  suiteName: string
+  feature: string
+  vector: string
+}
+
+/**
  * Parses the test vector results from the JUnit XML files against the
  * test vectors located in the spec path glob pattern.
  */
 export const buildTestVectorReport = async (
   specPath: string,
   reportFiles: string[],
-  testCasesPrefix: string
+  suiteRegex: SuiteRegexStrFilters
 ): Promise<TestVectorReport> => {
   const testVectors = await getTestVectors(specPath)
   const testVectorReport: TestVectorReport = {
@@ -63,9 +72,9 @@ export const buildTestVectorReport = async (
     successVectors: []
   }
 
-  const junitTestCases = await parseJunitTestCases(reportFiles)
+  const junitTestSuites = await parseJunitTestSuites(reportFiles)
   const { totalJunitTestCases, totalSpecTestCases } =
-    addJunitToVectorsTestCases(junitTestCases, testVectors, testCasesPrefix)
+    addJunitToVectorsTestCases(junitTestSuites, testVectors, suiteRegex)
   testVectorReport.totalJunitTestCases = totalJunitTestCases
   testVectorReport.specTestCases = totalSpecTestCases
   core.info(
@@ -159,15 +168,20 @@ const mapTestVectorFile = (file: string): TestVector => {
   let fileFolderName = fileFullPath.pop()
   if (fileFolderName === 'vectors') {
     // ignore the vectors folder to get the parent folder name
-    // eg. .../protocol/vectors/parse-balance.json category = protocol
+    // eg. .../protocol/vectors/parse-balance.json, feature = protocol
     fileFolderName = fileFullPath.pop()
   }
 
-  const category = fileFolderName?.replace(/-/g, '_').toLowerCase() || ''
+  const feature =
+    fileFolderName
+      ?.split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('') || ''
+
   const name = fileName.split('.')[0].replace(/-/g, '_').toLowerCase()
 
   const testVector = {
-    category,
+    feature,
     name,
     file,
     testCases: []
@@ -178,40 +192,67 @@ const mapTestVectorFile = (file: string): TestVector => {
 }
 
 const addJunitToVectorsTestCases = (
-  junitTestCases: TestCase[],
+  junitTestSuites: TestSuite[],
   testVectors: TestVector[],
-  testCasesPrefix: string
+  suiteRegex: SuiteRegexStrFilters
 ): { totalJunitTestCases: number; totalSpecTestCases: number } => {
-  const totalJunitTestCases = junitTestCases.length
-
+  let totalJunitTestCases = 0
   let totalSpecTestCases = 0
-  for (const testCase of junitTestCases) {
-    if (testCasesPrefix && !testCase.name?.startsWith(testCasesPrefix)) continue
+  const suiteNameString = new RegExp(suiteRegex.suiteName)
+  const featureRegex = new RegExp(suiteRegex.feature)
+  const vectorRegex = new RegExp(suiteRegex.vector)
 
-    // check if testcase is relevant to any test vector key
-    const testVector = testVectors.find(vector => {
-      const vectorCategoryName = vector.category.toLowerCase()
-      const vectorCategoryNameClean = vectorCategoryName.replace(/[-_\s]/g, '')
+  for (const testSuite of junitTestSuites) {
+    totalJunitTestCases += testSuite.testcase?.length ?? 0
 
-      const testCaseName = testCase.name?.toLowerCase() || ''
-      const testCaseNameWords = testCaseName.split(' ')
-      const testCaseClassName = testCase.classname?.toLowerCase() || ''
+    if (
+      !testSuite.testcase ||
+      !testSuite.name ||
+      !suiteNameString.test(testSuite.name)
+    )
+      continue
 
-      return (
-        // test case has the same name as the test vector
-        testCaseNameWords.find(word => word === vector.name) &&
-        // and test case contains the test vector category
-        (testCaseName.includes(vectorCategoryName) ||
-          testCaseName.includes(vectorCategoryNameClean) ||
-          // or test case class name contains the test vector category
-          testCaseClassName.includes(vectorCategoryName) ||
-          testCaseClassName.includes(vectorCategoryNameClean))
+    const feature = extractFeature(testSuite.name, featureRegex)
+    if (!feature) continue
+
+    for (const testCase of testSuite.testcase) {
+      if (!testCase.name) continue
+
+      const vectorName = extractTestName(testCase.name, vectorRegex)
+      if (!vectorName) continue
+
+      const testVector = testVectors.find(
+        vector => vector.feature === feature && vector.name === vectorName
       )
-    })
-    if (!testVector) continue
-    testVector.testCases.push(testCase)
-    totalSpecTestCases++
+      if (testVector) {
+        testVector.testCases.push(testCase)
+        totalSpecTestCases++
+      } else {
+        core.warning(`Test vector not found: ${feature}/${vectorName} `)
+      }
+    }
   }
 
   return { totalJunitTestCases, totalSpecTestCases }
+}
+
+const extractFeature = (input: string, featureRegex: RegExp): string => {
+  const matches = featureRegex.exec(input)
+  // If a match is found, it will be in the second element of the 'matches' array.
+  if (matches && matches.length >= 2) {
+    return matches[1]
+  }
+
+  return ''
+}
+
+const extractTestName = (input: string, testRegex: RegExp): string => {
+  const matches = testRegex.exec(input)
+
+  if (matches && matches.length > 0) {
+    // If a match is found, it will be in the last element.
+    return matches[matches.length - 1]
+  }
+
+  return ''
 }
