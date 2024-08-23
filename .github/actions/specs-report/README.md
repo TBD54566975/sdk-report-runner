@@ -17,6 +17,9 @@ GitHub Action to Parse and Generate tbd Specs Reports
    with:
       junit-report-paths: packages/*/results.xml # Glob Path with the JUnit test vectors report
       spec-path: tbdex # relative path to the tbd spec submodule folder
+      suite-name-regex: TbdexTestVector # regex to filter the test suites names
+      feature-regex: TbdexTestVectors(\w+) # regex to extract the spec feature from the test suite name
+      vector-regex: TbdexTestVectors(\w+) (\w+) # regex to extract the spec vector from the test suite name
       fail-on-missing-vectors: true # if false, it will not fail the build if the test vectors are missing
       fail-on-failed-test-cases: true # if false, it will not fail the build if the test cases are failed
       comment-on-pr: true # if true, it will comment on the PR with the report

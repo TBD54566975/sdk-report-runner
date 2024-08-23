@@ -11,8 +11,14 @@ inputs:
   spec-path:
     description: 'The relative path to the tbd spec submodule folder'
     required: true
-  test-cases-prefix:
-    description: 'The prefix of the test cases to be filtered'
+  suite-name-regex:
+    description: 'The regex to filter the suite name'
+    required: false
+  feature-regex:
+    description: 'The regex to filter the feature in the test suite name'
+    required: false
+  vector-regex:
+    description: 'The regex to filter the vector in the test case name'
     required: false
   comment-on-pr:
     description: 'Whether to comment the summary report on the PR'
