@@ -1,0 +1,139 @@
+name: Build SDKs Version Conformace Matrix Dashboard
+on:
+  workflow_dispatch:
+    inputs:
+      specTag:
+        description: "The tag of the spec, eg: v2.0"
+        type: string
+        required: true
+      specRepo:
+        description: "TBD Specs"
+        type: choice
+        required: true
+        options:
+          - web5-spec
+          - tbdex
+      sdkReleaseRepo:
+        description: "The release repo, eg: TBD54566975/web5-rs, TBD54566975/tbdex-js (sdk mode only)"
+        type: string
+        required: false
+      sdkReleasePackageName:
+        description: "The name of the package that is being released (useful for monorepos, eg: web5-rs releases web5-core-kt)"
+        type: string
+        required: false
+      sdkReleaseTag:
+        description: "The release tag, eg: v1.23 (sdk mode only)"
+        type: string
+        required: false
+      sdkReleaseWorkflowRunId:
+        description: "The run ID of the source workflow that uploaded the tests vectors (sdk mode only)"
+        type: string
+        required: false
+      sdkReleaseJunitFiles:
+        description: "The name of the artifact that contains the JUnit XML files (sdk mode only)" # kotlin-test-results,
+        type: string
+        required: false
+      sdkSuiteJunitRegexParams:
+        description: "The SDK regex params, should be a string in the following order split by newlines: suiteNameRegex, featureRegex, vectorRegex, extractFeatureOnTestCaseName, prettifyFeature"
+        type: string
+        required: false
+permissions:
+  contents: write
+jobs:
+  update-conformance-table:
+    concurrency: conformance-table-build # always run one instance of this workflow, to avoid conflicts in the conformance json generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Release Mode Inputs
+        id: release-mode
+        run: |
+          echo "Spec Tag: ${{ inputs.specTag }}"
+          echo "Spec Repo: TBD ${{ inputs.specRepo }}"
+          echo "SPEC_FULL_REPO=TBD54566975/${{ inputs.specRepo }}" >> $GITHUB_OUTPUT
+
+          if [[ "${{ inputs.sdkReleaseRepo }}" != "" ]]; then
+            echo "sdkReleaseRepo is present - Release Mode = SDK"
+            echo "Release Repo Tag: ${{ inputs.sdkReleaseTag }}"
+            echo "Release JUnit Files Artifact Name: ${{ inputs.sdkReleaseJunitFiles }}"
+            echo "Release Workflow Run ID: ${{ inputs.sdkReleaseWorkflowRunId }}"
+
+            # throw an error if any of the sdk mode inputs are not set
+            if [[ "${{ inputs.sdkReleaseRepo }}" == "" || "${{ inputs.sdkReleaseTag }}" == "" || "${{ inputs.sdkReleaseJunitFiles }}" == "" || "${{ inputs.sdkReleaseWorkflowRunId }}" == "" || "${{ inputs.sdkSuiteJunitRegexParams }}" == "" ]]; then
+              echo "Error: All SDK mode inputs are required"
+              exit 1
+            fi
+
+            # Read the input into an array, preserving empty lines
+            regex_input="${{ inputs.sdkSuiteJunitRegexParams }}"
+            readarray -t sdkSuiteJunitRegexParamsArray <<< "$regex_input"
+            echo "All Suite Regex Params array elements:"
+            for i in "${!sdkSuiteJunitRegexParamsArray[@]}"; do
+                echo "Element $i: ${sdkSuiteJunitRegexParamsArray[$i]}"
+            done
+
+            # Function to safely get array element or default value
+            get_suite_regex_param() {
+              local index=$1
+              local default=$2
+              if [[ -n "${sdkSuiteJunitRegexParamsArray[$index]}" ]]; then
+                echo "${sdkSuiteJunitRegexParamsArray[$index]}"
+              else
+                echo "$default"
+              fi
+            }
+
+            # Set and output parameters
+            SUITE_NAME_REGEX=$(get_suite_regex_param 0 "")
+            FEATURE_REGEX=$(get_suite_regex_param 1 "")
+            VECTOR_REGEX=$(get_suite_regex_param 2 "")
+            EXTRACT_FEATURE=$(get_suite_regex_param 3 "false")
+            PRETTIFY_FEATURE=$(get_suite_regex_param 4 "false")
+
+            echo "SUITE_NAME_REGEX: $SUITE_NAME_REGEX"
+            echo "SUITE_NAME_REGEX=$SUITE_NAME_REGEX" >> $GITHUB_OUTPUT
+            echo "FEATURE_REGEX: $FEATURE_REGEX"
+            echo "FEATURE_REGEX=$FEATURE_REGEX" >> $GITHUB_OUTPUT
+            echo "VECTOR_REGEX: $VECTOR_REGEX"
+            echo "VECTOR_REGEX=$VECTOR_REGEX" >> $GITHUB_OUTPUT
+            echo "EXTRACT_FEATURE: $EXTRACT_FEATURE"
+            echo "EXTRACT_FEATURE=$EXTRACT_FEATURE" >> $GITHUB_OUTPUT
+            echo "PRETTIFY_FEATURE: $PRETTIFY_FEATURE"
+            echo "PRETTIFY_FEATURE=$PRETTIFY_FEATURE" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Checkout spec repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.release-mode.outputs.SPEC_FULL_REPO }}
+          path: ${{ inputs.specRepo }}
+          ref: ${{ inputs.specTag }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.sdkReleaseRepo != '' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ inputs.sdkReleaseRepo }}
+          run-id: ${{ github.event.inputs.sdkReleaseWorkflowRunId }}
+          name: ${{ inputs.sdkReleaseJunitFiles }}
+          path: junit-results
+
+      - name: Builds conformance table
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@leordev/conformance # TODO: change before merge
+        with:
+          junit-report-paths: junit-results/**/*.xml
+          spec-path: ${{ inputs.specRepo }}
+          spec-name: ${{ inputs.specRepo }}
+          spec-tag: ${{ inputs.specTag }}
+          release-mode: ${{ inputs.sdkReleaseRepo != '' && 'sdk' || 'spec' }}
+          release-repo: ${{ inputs.sdkReleaseRepo || steps.release-mode.outputs.SPEC_FULL_REPO }}
+          release-package-name: ${{ inputs.sdkReleasePackageName }}
+          release-tag: ${{ inputs.sdkReleaseTag }}
+          suite-name-regex: ${{ steps.release-mode.outputs.SUITE_NAME_REGEX }}
+          feature-regex: ${{ steps.release-mode.outputs.FEATURE_REGEX }}
+          vector-regex: ${{ steps.release-mode.outputs.VECTOR_REGEX }}
+          extract-feature-on-test-case-name: ${{ steps.release-mode.outputs.EXTRACT_FEATURE }}
+          prettify-feature: ${{ steps.release-mode.outputs.PRETTIFY_FEATURE }}
+          git-token: ${{ secrets.GITHUB_TOKEN }}

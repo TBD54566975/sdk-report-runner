@@ -38293,20 +38293,49 @@ const core = __importStar(__nccwpck_require__(2186));
  * @returns {ActionInputs} The inputs for the action.
  */
 const readActionInputs = () => {
+    const releaseMode = core.getInput('release-mode') || 'none';
+    const isDefaultReport = releaseMode === 'none';
+    const isReleaseSpecMode = releaseMode === 'spec';
+    const isReleaseSdkMode = releaseMode === 'sdk';
+    if (!isReleaseSpecMode && !isReleaseSdkMode && !isDefaultReport) {
+        throw new Error('Invalid release mode');
+    }
+    const isReleaseMode = isReleaseSpecMode || isReleaseSdkMode;
     const junitReportPaths = core.getInput('junit-report-paths', {
-        required: true
+        required: isDefaultReport || isReleaseSdkMode
     });
-    const specPath = core.getInput('spec-path', { required: true });
+    const specPath = core.getInput('spec-path', {
+        required: isReleaseSpecMode || isDefaultReport
+    });
     // Fallback to the default tbdex-js regex filters if not provided
     const suiteRegexStrFilters = {
         suiteName: core.getInput('suite-name-regex') || 'TbdexTestVector',
         feature: core.getInput('feature-regex') || 'TbdexTestVectors(\\w+)',
-        vector: core.getInput('vector-regex') || 'TbdexTestVectors(\\w+) (\\w+)'
+        vector: core.getInput('vector-regex') || 'TbdexTestVectors(\\w+) (\\w+)',
+        extractFeatureOnTestCaseName: core.getInput('extract-feature-on-test-case-name') === 'true',
+        prettifyFeature: core.getInput('prettify-feature') === 'true'
     };
-    const gitToken = core.getInput('git-token');
     const commentOnPr = core.getInput('comment-on-pr') === 'true';
+    const gitToken = core.getInput('git-token', {
+        required: commentOnPr || isReleaseMode
+    });
     const failOnMissingVectors = core.getInput('fail-on-missing-vectors') === 'true';
     const failOnFailedTestCases = core.getInput('fail-on-failed-test-cases') === 'true';
+    const releaseRepo = core.getInput('release-repo', {
+        required: isReleaseMode
+    });
+    const releaseTag = core.getInput('release-tag', {
+        required: isReleaseSdkMode
+    });
+    const specName = core.getInput('spec-name', {
+        required: isReleaseMode
+    });
+    const specTag = core.getInput('spec-tag', {
+        required: isReleaseMode
+    });
+    const releasePackageName = core.getInput('release-package-name', {
+        required: isReleaseSdkMode
+    });
     return {
         junitReportPaths,
         specPath,
@@ -38314,7 +38343,13 @@ const readActionInputs = () => {
         gitToken,
         commentOnPr,
         failOnMissingVectors,
-        failOnFailedTestCases
+        failOnFailedTestCases,
+        releaseMode,
+        releaseRepo,
+        releaseTag,
+        releasePackageName,
+        specName,
+        specTag
     };
 };
 exports.readActionInputs = readActionInputs;
@@ -38362,7 +38397,7 @@ const fs_1 = __nccwpck_require__(7147);
 const getFiles = async (paths) => {
     const globPattern = Array.isArray(paths) ? paths.join('\n') : paths;
     const globber = await glob.create(globPattern);
-    const files = await globber.glob();
+    const files = (await globber.glob()).filter(f => (0, fs_1.statSync)(f).isFile());
     core.info(`Got ${files.length} files ...`);
     core.info(files.join('\n'));
     return files;
@@ -38425,7 +38460,6 @@ const parseJunitTestSuites = async (reportFiles) => {
     for (const file of reportFiles) {
         const fileContent = (0, files_1.readFile)(file);
         core.debug(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`);
-        core.info(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`);
         const junit = await junit2json.parse(fileContent);
         if (!junit) {
             throw new Error(`Failed to parse JUnit XML file: ${file}`);
@@ -38437,7 +38471,8 @@ const parseJunitTestSuites = async (reportFiles) => {
             testSuites.push(junit);
         }
         else {
-            throw new Error(`Failed to get testcases from JUnit XML file: ${file}\n${JSON.stringify(junit)}`);
+            const warning = `Unable to read testcases from JUnit XML file: ${file}\n${JSON.stringify(junit)}`;
+            core.warning(warning);
         }
     }
     return testSuites;
@@ -38482,20 +38517,27 @@ const action_inputs_1 = __nccwpck_require__(9437);
 const files_1 = __nccwpck_require__(7255);
 const test_vectors_1 = __nccwpck_require__(7465);
 const summary_report_1 = __nccwpck_require__(3129);
+const spec_release_1 = __nccwpck_require__(5908);
 const pr_comment_1 = __nccwpck_require__(604);
 /**
  * The main function for the action.
  */
 async function run() {
     try {
-        const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = (0, action_inputs_1.readActionInputs)();
-        const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
-        const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
-        const summary = (0, summary_report_1.generateSummary)(report);
-        if (commentOnPr) {
-            await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
+        const inputs = (0, action_inputs_1.readActionInputs)();
+        const { releaseMode } = inputs;
+        if (releaseMode === 'none') {
+            await handleDefaultReport(inputs);
         }
-        setJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
+        else if (releaseMode === 'spec') {
+            await (0, spec_release_1.handleSpecRelease)(inputs);
+        }
+        else if (releaseMode === 'sdk') {
+            await (0, spec_release_1.handleSdkRelease)(inputs);
+        }
+        else {
+            throw new Error('Unknown release mode');
+        }
     }
     catch (error) {
         // Fail the workflow run if an error occurs
@@ -38503,6 +38545,16 @@ async function run() {
             core.setFailed(error.message);
     }
 }
+const handleDefaultReport = async (inputs) => {
+    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = inputs;
+    const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
+    const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
+    const summary = (0, summary_report_1.generateSummary)(report);
+    if (commentOnPr) {
+        await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
+    }
+    setJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
+};
 /**
  * Sets the job status based on the test vector results.
  * @param testVectorResults - The test vector report object
@@ -38606,6 +38658,187 @@ const addCommentToPr = async (summary, gitToken) => {
     }
 };
 exports.addCommentToPr = addCommentToPr;
+
+
+/***/ }),
+
+/***/ 5908:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.writeSpecConformanceJson = exports.readSpecConformanceJson = exports.extractSdkTestVectorCases = exports.handleSdkRelease = exports.handleSpecRelease = void 0;
+const github = __importStar(__nccwpck_require__(5438));
+const core = __importStar(__nccwpck_require__(2186));
+const test_vectors_1 = __nccwpck_require__(7465);
+const files_1 = __nccwpck_require__(7255);
+const junit_handler_1 = __nccwpck_require__(1886);
+const handleSpecRelease = async (inputs) => {
+    const { specPath, releaseRepo, specTag, specName, gitToken } = inputs;
+    const testVectors = await (0, test_vectors_1.getTestVectors)(specPath);
+    const specReleaseTestVectors = testVectorsToSpecRelease(releaseRepo, specTag, testVectors);
+    const specReleaseLink = getReleaseLink(releaseRepo, specTag);
+    return addSpecReleaseEntry(specName, specTag, specReleaseLink, specReleaseTestVectors, gitToken);
+};
+exports.handleSpecRelease = handleSpecRelease;
+const handleSdkRelease = async (inputs) => {
+    const { junitReportPaths, suiteRegexStrFilters, releaseRepo, releasePackageName, releaseTag, specName, specTag, gitToken } = inputs;
+    const specConformanceJsonFileName = `spec-conformance-${specName}.json`;
+    const { data, sha: originalSha } = await (0, exports.readSpecConformanceJson)(specConformanceJsonFileName, gitToken);
+    const specRelease = data.specReleases.find(release => release.version === specTag);
+    if (!specRelease) {
+        throw new Error(`Spec release ${specTag} not found in conformance JSON yet. Are you sure you released the spec or have the right spec version?`);
+    }
+    const sdkCasesReport = await (0, exports.extractSdkTestVectorCases)(junitReportPaths, suiteRegexStrFilters);
+    core.info(`Extracted SDK test cases:\n${JSON.stringify(sdkCasesReport, null, 2)}`);
+    const releaseLink = getReleaseLink(releaseRepo, releaseTag);
+    specRelease.sdks[releasePackageName] = {
+        version: releaseTag,
+        releaseLink,
+        casesReport: sdkCasesReport
+    };
+    return (0, exports.writeSpecConformanceJson)(releasePackageName, releaseTag, specConformanceJsonFileName, gitToken, data, originalSha);
+};
+exports.handleSdkRelease = handleSdkRelease;
+const extractSdkTestVectorCases = async (junitReportPaths, suiteRegexStrFilters) => {
+    const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
+    const junitTestSuites = await (0, junit_handler_1.parseJunitTestSuites)(reportFiles);
+    const testVectorsCases = (0, test_vectors_1.extractJunitVectorsTestCases)(junitTestSuites, suiteRegexStrFilters);
+    return testVectorsCases.reduce((acc, { feature, name, testCase }) => {
+        acc[feature] = acc[feature] || {};
+        acc[feature][name] = mapTestCaseStatusResult(testCase);
+        return acc;
+    }, {});
+};
+exports.extractSdkTestVectorCases = extractSdkTestVectorCases;
+const mapTestCaseStatusResult = (testCase) => {
+    const status = (testCase.status ?? 'passed');
+    const testCaseDetails = testCase.error ?? testCase.failure ?? [];
+    const details = testCaseDetails
+        .map(detail => `${detail.inner || ''}  ${detail.message || ''}`)
+        .join('\n');
+    return { status, details: details || undefined };
+};
+const testVectorsToSpecRelease = (releaseRepo, specTag, testVectors) => {
+    if (testVectors.length === 0) {
+        throw new Error('No test vectors found');
+    }
+    const [owner, repo] = releaseRepo.split('/');
+    const srcLink = `https://github.com/${owner}/${repo}/tree/${specTag}/test-vectors`;
+    // Group test cases by feature
+    const cases = testVectors.reduce((acc, { feature, name }) => {
+        acc[feature] = acc[feature] || [];
+        acc[feature].push(name);
+        return acc;
+    }, {});
+    return {
+        srcLink,
+        cases
+    };
+};
+const addSpecReleaseEntry = async (specName, specTag, specReleaseLink, testVectors, gitToken) => {
+    const specConformanceJsonFileName = `spec-conformance-${specName}.json`;
+    const { data, sha: originalSha } = await (0, exports.readSpecConformanceJson)(specConformanceJsonFileName, gitToken);
+    const currentRelease = data.specReleases.find(release => release.version === specTag);
+    if (currentRelease) {
+        core.warning(`Spec version ${specTag} already exists in the conformance JSON, overriding spec test vectors array only.`);
+        currentRelease.testVectors = testVectors;
+    }
+    else {
+        // Create new spec release entry
+        const newSpecRelease = {
+            version: specTag,
+            releaseLink: specReleaseLink,
+            testVectors,
+            sdks: {}
+        };
+        data.specReleases.unshift(newSpecRelease);
+    }
+    await (0, exports.writeSpecConformanceJson)(specName, specTag, specConformanceJsonFileName, gitToken, data, originalSha);
+};
+const getReleaseLink = (userRepo, releaseTag) => {
+    const fullRepoName = !userRepo.includes('/')
+        ? `TBD54566975/${userRepo}`
+        : userRepo;
+    const [owner, repo] = fullRepoName.split('/');
+    return `https://github.com/${owner}/${repo}/releases/tag/${releaseTag}`;
+};
+const readSpecConformanceJson = async (specConformanceJsonFileName, gitToken) => {
+    try {
+        const reportRepo = github.context.repo;
+        const octokit = github.getOctokit(gitToken);
+        const { data: fileData } = await octokit.rest.repos.getContent({
+            owner: reportRepo.owner,
+            repo: reportRepo.repo,
+            path: specConformanceJsonFileName,
+            ref: 'gh-pages'
+        });
+        if ('content' in fileData) {
+            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+            const data = JSON.parse(content);
+            return { data, sha: fileData.sha };
+        }
+        else {
+            throw new Error('Unexpected response format');
+        }
+    }
+    catch (error) {
+        if (error.status === 404) {
+            const initialConformanceData = { data: { specReleases: [] } };
+            core.warning(`Conformance dashboard JSON file not found, initializing new conformance JSON ${initialConformanceData}...`);
+            return initialConformanceData;
+        }
+        core.error(`Conformance dashboard read failure: ${error}`);
+        throw error;
+    }
+};
+exports.readSpecConformanceJson = readSpecConformanceJson;
+const writeSpecConformanceJson = async (releaseRepo, releaseTag, specConformanceJsonFileName, gitToken, conformanceData, originalSha) => {
+    const conformanceJsonString = JSON.stringify(conformanceData, null, 2);
+    core.info(`Writing spec conformance ${specConformanceJsonFileName}:\n${conformanceJsonString}`);
+    const isTest = process.env.SKIP_WRITE_CONFORMANCE_JSON === 'true';
+    if (!isTest) {
+        const reportRepo = github.context.repo;
+        const octokit = github.getOctokit(gitToken);
+        await octokit.rest.repos.createOrUpdateFileContents({
+            owner: reportRepo.owner,
+            repo: reportRepo.repo,
+            path: specConformanceJsonFileName,
+            message: `[ci] Update ${specConformanceJsonFileName}: ${releaseRepo}@${releaseTag}`,
+            content: Buffer.from(conformanceJsonString).toString('base64'),
+            sha: originalSha,
+            branch: 'gh-pages'
+        });
+    }
+    else {
+        core.info(`Test mode, skipping write to ${specConformanceJsonFileName}...`);
+    }
+};
+exports.writeSpecConformanceJson = writeSpecConformanceJson;
 
 
 /***/ }),
@@ -38813,7 +39046,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.buildTestVectorReport = void 0;
+exports.extractFeatureAndName = exports.extractTestName = exports.extractFeature = exports.extractJunitVectorsTestCases = exports.getTestVectors = exports.buildTestVectorReport = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const files_1 = __nccwpck_require__(7255);
 const junit_handler_1 = __nccwpck_require__(1886);
@@ -38822,7 +39055,7 @@ const junit_handler_1 = __nccwpck_require__(1886);
  * test vectors located in the spec path glob pattern.
  */
 const buildTestVectorReport = async (specPath, reportFiles, suiteRegex) => {
-    const testVectors = await getTestVectors(specPath);
+    const testVectors = await (0, exports.getTestVectors)(specPath);
     const testVectorReport = {
         totalJunitFiles: reportFiles.length,
         totalTestVectors: testVectors.length,
@@ -38884,6 +39117,7 @@ const getTestVectors = async (specPath) => {
     const testVectorsFiles = await (0, files_1.getFiles)(specPathGlob);
     return testVectorsFiles.filter(checkTestVectorFile).map(mapTestVectorFile);
 };
+exports.getTestVectors = getTestVectors;
 /**
  * Checks if the test vector file is valid.
  * @param file - The file path of the test vector file
@@ -38930,38 +39164,73 @@ const mapTestVectorFile = (file) => {
     return testVector;
 };
 const addJunitToVectorsTestCases = (junitTestSuites, testVectors, suiteRegex) => {
-    let totalJunitTestCases = 0;
+    const totalJunitTestCases = junitTestSuites.reduce((acc, testSuite) => {
+        return acc + (testSuite.testcase?.length ?? 0);
+    }, 0);
     let totalSpecTestCases = 0;
-    const suiteNameString = new RegExp(suiteRegex.suiteName);
-    const featureRegex = new RegExp(suiteRegex.feature);
-    const vectorRegex = new RegExp(suiteRegex.vector);
-    for (const testSuite of junitTestSuites) {
-        totalJunitTestCases += testSuite.testcase?.length ?? 0;
-        if (!testSuite.testcase ||
-            !testSuite.name ||
-            !suiteNameString.test(testSuite.name))
-            continue;
-        const feature = extractFeature(testSuite.name, featureRegex);
-        if (!feature)
-            continue;
-        for (const testCase of testSuite.testcase) {
-            if (!testCase.name)
-                continue;
-            const vectorName = extractTestName(testCase.name, vectorRegex);
-            if (!vectorName)
-                continue;
-            const testVector = testVectors.find(vector => vector.feature === feature && vector.name === vectorName);
-            if (testVector) {
-                testVector.testCases.push(testCase);
-                totalSpecTestCases++;
-            }
-            else {
-                core.warning(`Test vector not found: ${feature}/${vectorName} `);
-            }
+    const vectorsTestCases = (0, exports.extractJunitVectorsTestCases)(junitTestSuites, suiteRegex);
+    for (const vectorTestCase of vectorsTestCases) {
+        const { feature, name, testCase } = vectorTestCase;
+        const testVector = testVectors.find(vector => vector.feature === feature && vector.name === name);
+        if (testVector) {
+            testVector.testCases.push(testCase);
+            totalSpecTestCases++;
+        }
+        else {
+            core.warning(`Test vector not found: ${feature}/${name} `);
         }
     }
     return { totalJunitTestCases, totalSpecTestCases };
 };
+/** Extracts only the vectors test cases from the JUnit test suites. */
+const extractJunitVectorsTestCases = (junitTestSuites, suiteRegex) => {
+    const suiteNameString = new RegExp(suiteRegex.suiteName);
+    const featureRegex = new RegExp(suiteRegex.feature);
+    const vectorRegex = new RegExp(suiteRegex.vector);
+    const vectorsTestCases = [];
+    for (const testSuite of junitTestSuites) {
+        if (!testSuite.testcase ||
+            !testSuite.name ||
+            !suiteNameString.test(testSuite.name))
+            continue;
+        let feature = '';
+        if (!suiteRegex.extractFeatureOnTestCaseName) {
+            feature = (0, exports.extractFeature)(testSuite.name, featureRegex);
+            if (!feature)
+                continue;
+        }
+        for (const testCase of testSuite.testcase) {
+            if (!testCase.name)
+                continue;
+            let vectorName = '';
+            // when feature is not defined we extract it from the test case name
+            if (!suiteRegex.extractFeatureOnTestCaseName) {
+                vectorName = (0, exports.extractTestName)(testCase.name, vectorRegex);
+            }
+            else {
+                const featureAndName = (0, exports.extractFeatureAndName)(testCase.name, vectorRegex);
+                feature = featureAndName.feature;
+                vectorName = featureAndName.name;
+            }
+            if (!vectorName)
+                continue;
+            // convert from snake case to title camel case
+            if (suiteRegex.prettifyFeature) {
+                feature = feature
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, char => char.toUpperCase())
+                    .replace(/ /g, '');
+            }
+            vectorsTestCases.push({
+                feature,
+                name: vectorName,
+                testCase
+            });
+        }
+    }
+    return vectorsTestCases;
+};
+exports.extractJunitVectorsTestCases = extractJunitVectorsTestCases;
 const extractFeature = (input, featureRegex) => {
     const matches = featureRegex.exec(input);
     // If a match is found, it will be in the second element of the 'matches' array.
@@ -38970,6 +39239,7 @@ const extractFeature = (input, featureRegex) => {
     }
     return '';
 };
+exports.extractFeature = extractFeature;
 const extractTestName = (input, testRegex) => {
     const matches = testRegex.exec(input);
     if (matches && matches.length > 0) {
@@ -38978,6 +39248,18 @@ const extractTestName = (input, testRegex) => {
     }
     return '';
 };
+exports.extractTestName = extractTestName;
+const extractFeatureAndName = (input, testRegex) => {
+    const matches = testRegex.exec(input);
+    if (matches && matches.length >= 2) {
+        // If a match is found, it will be in the last element.
+        const name = matches[matches.length - 1];
+        const feature = matches[matches.length - 2];
+        return { feature, name };
+    }
+    return { feature: '', name: '' };
+};
+exports.extractFeatureAndName = extractFeatureAndName;
 
 
 /***/ }),

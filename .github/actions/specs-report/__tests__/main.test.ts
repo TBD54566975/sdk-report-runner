@@ -7,11 +7,20 @@
  */
 
 import * as core from '@actions/core'
+import * as junit2json from 'junit2json'
+
 import * as main from '../src/main'
 import * as files from '../src/files'
 import * as prComment from '../src/pr-comment'
-import * as junit2json from 'junit2json'
-import { TBDEX_TEST_VECTORS_FILES, SUCCESS_MOCK, FAILURE_MOCK } from './mocks'
+import { ConformanceData } from '../src/spec-release'
+
+import {
+  TBDEX_TEST_VECTORS_FILES,
+  SUCCESS_MOCK,
+  FAILURE_MOCK,
+  WEB5_TEST_VECTORS_FILES,
+  WEB5_TEST_VECTORS_FEATURES
+} from './mocks'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -29,11 +38,42 @@ let readJsonFileMock: jest.SpiedFunction<typeof files.readJsonFile>
 let junitParseMock: jest.SpiedFunction<typeof junit2json.parse>
 let addCommentToPrMock: jest.SpiedFunction<typeof prComment.addCommentToPr>
 
-const defaultGetInputMockImplementation = (): void => {
+// Mock Octokit
+const mockOctokit = {
+  rest: {
+    repos: {
+      createOrUpdateFileContents: jest.fn(),
+      getContent: jest.fn()
+    }
+  }
+}
+
+// Mock fetch
+// const mockFetch = jest.fn()
+// global.fetch = mockFetch
+
+jest.mock('@actions/github', () => ({
+  getOctokit: jest.fn().mockImplementation(() => mockOctokit),
+  context: {
+    eventName: 'pull_request',
+    payload: { pull_request: { number: 123 } },
+    repo: { owner: 'TBD54566975', repo: 'sdk-report-runner' }
+  }
+}))
+
+const defaultGetInputMockImplementation = (
+  releaseMode?: 'spec' | 'sdk',
+  releaseParams?: {
+    releaseRepo?: string
+    releaseTag?: string
+    specName?: string
+    specTag?: string
+  }
+): void => {
   getInputMock.mockImplementation(name => {
     switch (name) {
       case 'junit-report-paths':
-        return '500'
+        return './whatever'
       case 'suite-name-regex':
         return 'TbdexTestVector' // or 'Web5TestVector' for Web5
       case 'feature-regex':
@@ -41,7 +81,7 @@ const defaultGetInputMockImplementation = (): void => {
       case 'vector-regex':
         return 'TbdexTestVectors(\\w+) (\\w+)'
       case 'spec-path':
-        return '500'
+        return './whatever'
       case 'git-token':
         return 'fake-token'
       case 'comment-on-pr':
@@ -50,6 +90,16 @@ const defaultGetInputMockImplementation = (): void => {
         return 'false'
       case 'fail-on-failed-test-cases':
         return 'true'
+      case 'release-mode':
+        return releaseMode || ''
+      case 'release-repo':
+        return releaseParams?.releaseRepo || ''
+      case 'release-tag':
+        return releaseParams?.releaseTag || ''
+      case 'spec-name':
+        return releaseParams?.specName || ''
+      case 'spec-tag':
+        return releaseParams?.specTag || ''
       default:
         return ''
     }
@@ -79,6 +129,7 @@ describe('action', () => {
 
     getFilesMock = jest.spyOn(files, 'getFiles').mockImplementation()
     readJsonFileMock = jest.spyOn(files, 'readJsonFile').mockImplementation()
+    readJsonFileMock.mockReturnValue(VALID_SPEC_JSON_BODY)
 
     addCommentToPrMock = jest
       .spyOn(prComment, 'addCommentToPr')
@@ -94,7 +145,6 @@ describe('action', () => {
       .mockReturnValueOnce(Promise.resolve(SUCCESS_MOCK.junitFiles))
       // get test vector json
       .mockReturnValueOnce(Promise.resolve(TBDEX_TEST_VECTORS_FILES))
-    readJsonFileMock.mockReturnValue(VALID_SPEC_JSON_BODY)
 
     const rawJunitFile = files.readFile(SUCCESS_MOCK.junitFiles[0])
 
@@ -139,7 +189,6 @@ describe('action', () => {
       .mockReturnValueOnce(Promise.resolve(FAILURE_MOCK.junitFiles))
       // get test vector json
       .mockReturnValueOnce(Promise.resolve(TBDEX_TEST_VECTORS_FILES))
-    readJsonFileMock.mockReturnValue(VALID_SPEC_JSON_BODY)
 
     const rawJunitFile = files.readFile(FAILURE_MOCK.junitFiles[0])
 
@@ -171,5 +220,65 @@ describe('action', () => {
     }
     const testVectorReport = JSON.parse(output['test-vector-report'])
     expect(testVectorReport).toEqual(expectedReport)
+  })
+
+  it('generates a spec release json file successfully', async () => {
+    defaultGetInputMockImplementation('spec', {
+      releaseRepo: 'TBD54566975/web5-spec',
+      specName: 'web5-spec',
+      specTag: 'v2.0'
+    })
+
+    //   defaultGetInputMockImplementation('sdk', {
+    //     releaseRepo: 'TBD54566975/web5-kt',
+    //     releaseTag: 'v1.9.3',
+    //     specName: 'web5-spec',
+    //     specTag: 'v2.0'
+    //   })
+
+    getFilesMock
+      // get test vector json
+      .mockReturnValueOnce(Promise.resolve(WEB5_TEST_VECTORS_FILES))
+
+    const expectedConformanceData: ConformanceData = {
+      specReleases: [
+        {
+          version: 'v2.0',
+          releaseLink:
+            'https://github.com/TBD54566975/web5-spec/releases/tag/v2.0',
+          testVectors: {
+            srcLink:
+              'https://github.com/TBD54566975/web5-spec/tree/v2.0/test-vectors',
+            cases: WEB5_TEST_VECTORS_FEATURES
+          },
+          sdks: {}
+        }
+      ]
+    }
+
+    // Mock the Octokit getContent method to throw a 404 error
+    mockOctokit.rest.repos.getContent.mockRejectedValue({
+      status: 404,
+      message: 'Not Found'
+    })
+
+    await main.run()
+    expect(runMock).toHaveReturned()
+
+    expect(
+      mockOctokit.rest.repos.createOrUpdateFileContents
+    ).toHaveBeenCalledTimes(1)
+    expect(
+      mockOctokit.rest.repos.createOrUpdateFileContents
+    ).toHaveBeenCalledWith({
+      owner: 'TBD54566975',
+      repo: 'sdk-report-runner',
+      path: 'spec-conformance-web5-spec.json',
+      message: `[ci] Update spec-conformance-web5-spec.json: web5-spec@v2.0`,
+      content: Buffer.from(
+        JSON.stringify(expectedConformanceData, null, 2)
+      ).toString('base64'),
+      branch: 'gh-pages'
+    })
   })
 })

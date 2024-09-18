@@ -7,10 +7,10 @@ inputs:
     description:
       'Glob Path with the JUnit test vectors report, can be a single path or a
       list of paths in an array'
-    required: true
+    required: true # required if release-mode is "none"
   spec-path:
     description: 'The relative path to the tbd spec submodule folder'
-    required: true
+    required: true # required if release-mode is "none"
   suite-name-regex:
     description: 'The regex to filter the suite name'
     required: false
@@ -19,6 +19,14 @@ inputs:
     required: false
   vector-regex:
     description: 'The regex to filter the vector in the test case name'
+    required: false
+  extract-feature-on-test-case-name:
+    description: 'Whether to extract the feature on the test case name'
+    required: false
+  prettify-feature:
+    description:
+      'Whether to prettify the feature (converts snake_case to TitleCase,
+      required in rust)'
     required: false
   comment-on-pr:
     description: 'Whether to comment the summary report on the PR'
@@ -33,6 +41,30 @@ inputs:
   fail-on-failed-test-cases:
     description: 'Whether to fail the job if failed test cases are found'
     required: false
+  release-mode:
+    description: 'Set to "spec" or "sdk" to handle release updates'
+    required: false
+    default: 'none'
+  release-repo:
+    description:
+      'The release repo, eg: TBD54566975/web5-spec for spec releases,
+      TBD54566975/web5-rs for a sdk release'
+    required: false
+    default: 'none'
+  release-package-name:
+    description:
+      'The name of the package that is being released (useful for monorepos, eg:
+      web5-rs releases web5-core-kt)'
+    required: false
+  release-tag:
+    description: 'The tag of the release'
+    required: false
+  spec-name:
+    description: 'The name of the spec, eg: web5-spec'
+    required: false
+  spec-tag:
+    description: 'The tag of the spec release'
+    required: false # required if release-mode is "spec"
 
 # Define your outputs here.
 outputs:

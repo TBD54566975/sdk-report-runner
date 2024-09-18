@@ -294,6 +294,23 @@ export const WEB5_TEST_VECTORS_FILES = [
   '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/validate_definition.json',
   '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/presentation_exchange/validate_submission.json',
   '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vc_jwt/decode.json',
-  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vc_jwt/verify.json',
-  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vectors.schema.json'
+  '/home/runner/work/web5-kt/web5-kt/web5-spec/test-vectors/vc_jwt/verify.json'
 ]
+
+export const WEB5_TEST_VECTORS_FEATURES = {
+  Credentials: ['create', 'verify'],
+  CryptoEd25519: ['sign', 'verify'],
+  CryptoEs256k: ['sign', 'verify'],
+  DidDht: ['create', 'resolve'],
+  DidJwk: ['resolve'],
+  DidWeb: ['resolve'],
+  PortableDid: ['parse'],
+  PresentationExchange: [
+    'create_presentation_from_credentials',
+    'evaluate_presentation',
+    'select_credentials',
+    'validate_definition',
+    'validate_submission'
+  ],
+  VcJwt: ['decode', 'verify']
+}

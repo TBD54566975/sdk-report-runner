@@ -46,6 +46,15 @@ export interface SuiteRegexStrFilters {
   suiteName: string
   feature: string
   vector: string
+  extractFeatureOnTestCaseName?: boolean
+  prettifyFeature?: boolean
+}
+
+/** Test vectors with the mapped JUnit test cases results */
+export interface VectorsTestCases {
+  feature: string
+  name: string
+  testCase: TestCase
 }
 
 /**
@@ -125,7 +134,9 @@ export const buildTestVectorReport = async (
  * Reads the test vectors from the spec path.
  * @returns An array of test vectors.
  */
-const getTestVectors = async (specPath: string): Promise<TestVector[]> => {
+export const getTestVectors = async (
+  specPath: string
+): Promise<TestVector[]> => {
   const specPathGlob = `${specPath}/**/test-vectors/**/*.json`
   const testVectorsFiles = await getFiles(specPathGlob)
   return testVectorsFiles.filter(checkTestVectorFile).map(mapTestVectorFile)
@@ -196,15 +207,45 @@ const addJunitToVectorsTestCases = (
   testVectors: TestVector[],
   suiteRegex: SuiteRegexStrFilters
 ): { totalJunitTestCases: number; totalSpecTestCases: number } => {
-  let totalJunitTestCases = 0
+  const totalJunitTestCases = junitTestSuites.reduce((acc, testSuite) => {
+    return acc + (testSuite.testcase?.length ?? 0)
+  }, 0)
+
   let totalSpecTestCases = 0
+  const vectorsTestCases = extractJunitVectorsTestCases(
+    junitTestSuites,
+    suiteRegex
+  )
+
+  for (const vectorTestCase of vectorsTestCases) {
+    const { feature, name, testCase } = vectorTestCase
+
+    const testVector = testVectors.find(
+      vector => vector.feature === feature && vector.name === name
+    )
+    if (testVector) {
+      testVector.testCases.push(testCase)
+      totalSpecTestCases++
+    } else {
+      core.warning(`Test vector not found: ${feature}/${name} `)
+    }
+  }
+
+  return { totalJunitTestCases, totalSpecTestCases }
+}
+
+/** Extracts only the vectors test cases from the JUnit test suites. */
+export const extractJunitVectorsTestCases = (
+  junitTestSuites: TestSuite[],
+  suiteRegex: SuiteRegexStrFilters
+): VectorsTestCases[] => {
   const suiteNameString = new RegExp(suiteRegex.suiteName)
   const featureRegex = new RegExp(suiteRegex.feature)
   const vectorRegex = new RegExp(suiteRegex.vector)
 
-  for (const testSuite of junitTestSuites) {
-    totalJunitTestCases += testSuite.testcase?.length ?? 0
+  const vectorsTestCases: VectorsTestCases[] = []
 
+  for (const testSuite of junitTestSuites) {
     if (
       !testSuite.testcase ||
       !testSuite.name ||
@@ -212,31 +253,47 @@ const addJunitToVectorsTestCases = (
     )
       continue
 
-    const feature = extractFeature(testSuite.name, featureRegex)
-    if (!feature) continue
+    let feature = ''
+    if (!suiteRegex.extractFeatureOnTestCaseName) {
+      feature = extractFeature(testSuite.name, featureRegex)
+      if (!feature) continue
+    }
 
     for (const testCase of testSuite.testcase) {
       if (!testCase.name) continue
 
-      const vectorName = extractTestName(testCase.name, vectorRegex)
+      let vectorName = ''
+      // when feature is not defined we extract it from the test case name
+      if (!suiteRegex.extractFeatureOnTestCaseName) {
+        vectorName = extractTestName(testCase.name, vectorRegex)
+      } else {
+        const featureAndName = extractFeatureAndName(testCase.name, vectorRegex)
+        feature = featureAndName.feature
+        vectorName = featureAndName.name
+      }
+
       if (!vectorName) continue
 
-      const testVector = testVectors.find(
-        vector => vector.feature === feature && vector.name === vectorName
-      )
-      if (testVector) {
-        testVector.testCases.push(testCase)
-        totalSpecTestCases++
-      } else {
-        core.warning(`Test vector not found: ${feature}/${vectorName} `)
+      // convert from snake case to title camel case
+      if (suiteRegex.prettifyFeature) {
+        feature = feature
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, char => char.toUpperCase())
+          .replace(/ /g, '')
       }
+
+      vectorsTestCases.push({
+        feature,
+        name: vectorName,
+        testCase
+      })
     }
   }
 
-  return { totalJunitTestCases, totalSpecTestCases }
+  return vectorsTestCases
 }
 
-const extractFeature = (input: string, featureRegex: RegExp): string => {
+export const extractFeature = (input: string, featureRegex: RegExp): string => {
   const matches = featureRegex.exec(input)
   // If a match is found, it will be in the second element of the 'matches' array.
   if (matches && matches.length >= 2) {
@@ -246,7 +303,7 @@ const extractFeature = (input: string, featureRegex: RegExp): string => {
   return ''
 }
 
-const extractTestName = (input: string, testRegex: RegExp): string => {
+export const extractTestName = (input: string, testRegex: RegExp): string => {
   const matches = testRegex.exec(input)
 
   if (matches && matches.length > 0) {
@@ -255,4 +312,20 @@ const extractTestName = (input: string, testRegex: RegExp): string => {
   }
 
   return ''
+}
+
+export const extractFeatureAndName = (
+  input: string,
+  testRegex: RegExp
+): { feature: string; name: string } => {
+  const matches = testRegex.exec(input)
+
+  if (matches && matches.length >= 2) {
+    // If a match is found, it will be in the last element.
+    const name = matches[matches.length - 1]
+    const feature = matches[matches.length - 2]
+    return { feature, name }
+  }
+
+  return { feature: '', name: '' }
 }
