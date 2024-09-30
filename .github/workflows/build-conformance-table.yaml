@@ -121,7 +121,7 @@ jobs:
           path: junit-results
 
       - name: Builds conformance table
-        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@leordev/conformance # TODO: change before merge
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@main
         with:
           junit-report-paths: junit-results/**/*.xml
           spec-path: ${{ inputs.specRepo }}

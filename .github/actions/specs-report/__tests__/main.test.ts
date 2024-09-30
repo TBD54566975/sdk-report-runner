@@ -48,10 +48,6 @@ const mockOctokit = {
   }
 }
 
-// Mock fetch
-// const mockFetch = jest.fn()
-// global.fetch = mockFetch
-
 jest.mock('@actions/github', () => ({
   getOctokit: jest.fn().mockImplementation(() => mockOctokit),
   context: {
@@ -228,13 +224,6 @@ describe('action', () => {
       specName: 'web5-spec',
       specTag: 'v2.0'
     })
-
-    //   defaultGetInputMockImplementation('sdk', {
-    //     releaseRepo: 'TBD54566975/web5-kt',
-    //     releaseTag: 'v1.9.3',
-    //     specName: 'web5-spec',
-    //     specTag: 'v2.0'
-    //   })
 
     getFilesMock
       // get test vector json

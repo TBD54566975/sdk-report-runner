@@ -38357,6 +38357,78 @@ exports.readActionInputs = readActionInputs;
 
 /***/ }),
 
+/***/ 2157:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handleCIReport = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const files_1 = __nccwpck_require__(7255);
+const test_vectors_1 = __nccwpck_require__(7465);
+const summary_report_1 = __nccwpck_require__(3129);
+const pr_comment_1 = __nccwpck_require__(604);
+const handleCIReport = async (inputs) => {
+    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = inputs;
+    const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
+    const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
+    const summary = (0, summary_report_1.generateSummary)(report);
+    if (commentOnPr) {
+        await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
+    }
+    setCIJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
+};
+exports.handleCIReport = handleCIReport;
+/**
+ * Sets the CI job status based on the test vector results.
+ * @param testVectorResults - The test vector report object
+ * @param failOnMissingVectors - Whether to fail the job if missing test vectors are found
+ * @param failOnFailedTestCases - Whether to fail the job if failed test cases are found
+ */
+const setCIJobStatus = (testVectorResults, failOnMissingVectors, failOnFailedTestCases) => {
+    if (testVectorResults.specFailedTestCases > 0 && failOnFailedTestCases) {
+        core.setFailed('❌ Failed test vectors found');
+    }
+    else if (testVectorResults.missingVectors.length > 0 &&
+        failOnMissingVectors) {
+        core.setFailed('❌ Missing test vectors found');
+    }
+    else {
+        if (testVectorResults.specSkippedTestCases > 0) {
+            core.warning('⚠️ Skipped test vectors found');
+        }
+        core.setOutput('success', 'true');
+        core.info('✅ All test vectors passed');
+    }
+};
+
+
+/***/ }),
+
 /***/ 7255:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -38514,11 +38586,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
 const action_inputs_1 = __nccwpck_require__(9437);
-const files_1 = __nccwpck_require__(7255);
-const test_vectors_1 = __nccwpck_require__(7465);
-const summary_report_1 = __nccwpck_require__(3129);
+const ci_1 = __nccwpck_require__(2157);
 const spec_release_1 = __nccwpck_require__(5908);
-const pr_comment_1 = __nccwpck_require__(604);
 /**
  * The main function for the action.
  */
@@ -38527,7 +38596,7 @@ async function run() {
         const inputs = (0, action_inputs_1.readActionInputs)();
         const { releaseMode } = inputs;
         if (releaseMode === 'none') {
-            await handleDefaultReport(inputs);
+            await (0, ci_1.handleCIReport)(inputs);
         }
         else if (releaseMode === 'spec') {
             await (0, spec_release_1.handleSpecRelease)(inputs);
@@ -38545,38 +38614,6 @@ async function run() {
             core.setFailed(error.message);
     }
 }
-const handleDefaultReport = async (inputs) => {
-    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = inputs;
-    const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
-    const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
-    const summary = (0, summary_report_1.generateSummary)(report);
-    if (commentOnPr) {
-        await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
-    }
-    setJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
-};
-/**
- * Sets the job status based on the test vector results.
- * @param testVectorResults - The test vector report object
- * @param failOnMissingVectors - Whether to fail the job if missing test vectors are found
- * @param failOnFailedTestCases - Whether to fail the job if failed test cases are found
- */
-const setJobStatus = (testVectorResults, failOnMissingVectors, failOnFailedTestCases) => {
-    if (testVectorResults.specFailedTestCases > 0 && failOnFailedTestCases) {
-        core.setFailed('❌ Failed test vectors found');
-    }
-    else if (testVectorResults.missingVectors.length > 0 &&
-        failOnMissingVectors) {
-        core.setFailed('❌ Missing test vectors found');
-    }
-    else {
-        if (testVectorResults.specSkippedTestCases > 0) {
-            core.warning('⚠️ Skipped test vectors found');
-        }
-        core.setOutput('success', 'true');
-        core.info('✅ All test vectors passed');
-    }
-};
 
 
 /***/ }),

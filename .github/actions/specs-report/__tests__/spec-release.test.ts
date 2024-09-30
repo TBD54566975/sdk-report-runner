@@ -82,7 +82,6 @@ describe('handleSdkRelease', () => {
       feature: 'Web5TestVectorsTest\\$Web5TestVectors(\\w+)',
       vector: '(\\w+)'
     }
-    // TODO: only two vectors on v4.0.0 for kotlin?
     const expectedCases: specRelease.SdkEntryCasesReport = {
       CryptoEd25519: {
         verify: {

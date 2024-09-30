@@ -59,10 +59,10 @@ workflows using the `gh` cli.
 gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-spec-inputs.json
 gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-sdk-inputs-web5-core-kt.json
 gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-sdk-inputs-web5-rs.json
-
-# See a conformance matrix json file example here:
-open .github/actions/specs-report/example-spec-conformance-web5.json
 ```
+
+See a conformance matrix json file example here:
+[example-spec-conformance-web5.json](./example-spec-conformance-web5.json)
 
 ## Initial Setup
 
