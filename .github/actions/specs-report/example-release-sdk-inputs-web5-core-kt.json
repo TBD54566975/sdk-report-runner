@@ -1,0 +1,10 @@
+{
+  "specTag": "v0.3.1-alpha",
+  "specRepo": "web5-spec",
+  "sdkReleaseRepo": "TBD54566975/web5-rs",
+  "sdkReleasePackageName": "web5-core-kt",
+  "sdkReleaseTag": "v4.0.0",
+  "sdkReleaseJunitFiles": "kotlin-test-results",
+  "sdkReleaseWorkflowRunId": "11041691222",
+  "sdkSuiteJunitRegexParams": "Web5TestVectors\nWeb5TestVectorsTest\\\\\\$Web5TestVectors(\\w+)\n(\\w+)"
+}

@@ -2,9 +2,15 @@
 
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-GitHub Action to Parse and Generate tbd Specs Reports
+GitHub Action with two main purposes:
+
+1. Parse and Generate TBD Specs Test Vectors Reports on CI runs
+2. Leverage above Test Vectors reports parsing code to generate the SDKs vs Spec
+   Versioning Conformance matrix Dashboard
 
 ## Usage
+
+### Standard Test Vector Reporting
 
 ```yaml
 # add it as an step on your CI workflow right after your tests
@@ -31,6 +37,32 @@ _Check the available parameters in the [action.yml](./action.yml) file_
 Example report:
 
 ![Example Report](./example-report.png)
+
+### Spec Conformance Dashboard Release Modes
+
+To handle spec conformance dashboard automation, the action can operate in three
+modes using the `release-mode` input:
+
+- **Default Mode (`release-mode` not set):** Runs the standard test vector
+  reporting (as seen above).
+- **Spec Release Mode (`release-mode: spec`):** When a new spec version is
+  released, adds a new entry to the `specReleases` array in the JSON.
+- **SDK Release Mode (`release-mode: sdk`):** When a new SDK version is
+  released, updates the corresponding SDK entry under the relevant spec version
+  in the JSON.
+
+The release modes should only be used in this very same SDK report runner repo.
+To test it locally you could see the example files inputs and dispatch the
+workflows using the `gh` cli.
+
+```sh
+gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-spec-inputs.json
+gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-sdk-inputs-web5-core-kt.json
+gh workflow run build-conformance-table.yaml --ref <testing-branch> --json < example-release-sdk-inputs-web5-rs.json
+```
+
+See a conformance matrix json file example here:
+[example-spec-conformance-web5.json](./example-spec-conformance-web5.json)
 
 ## Initial Setup
 

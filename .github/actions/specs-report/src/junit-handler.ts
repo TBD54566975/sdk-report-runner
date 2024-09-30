@@ -18,7 +18,6 @@ export const parseJunitTestSuites = async (
   for (const file of reportFiles) {
     const fileContent = readFile(file)
     core.debug(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`)
-    core.info(`Parsing JUnit XML file: ${file}\n${fileContent}\n\n---`)
 
     const junit = await junit2json.parse(fileContent)
     if (!junit) {
@@ -30,9 +29,8 @@ export const parseJunitTestSuites = async (
     } else if ('testcase' in junit && junit.testcase) {
       testSuites.push(junit)
     } else {
-      throw new Error(
-        `Failed to get testcases from JUnit XML file: ${file}\n${JSON.stringify(junit)}`
-      )
+      const warning = `Unable to read testcases from JUnit XML file: ${file}\n${JSON.stringify(junit)}`
+      core.warning(warning)
     }
   }
   return testSuites

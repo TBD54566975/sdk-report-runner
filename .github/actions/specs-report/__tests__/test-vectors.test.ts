@@ -39,12 +39,12 @@ describe('test-vectors', () => {
     expect(parseJunitTestCasesMock).toHaveBeenCalledWith(WEB5_KT_JUNIT_FILES)
 
     expect(report.totalJunitFiles).toBe(2)
-    expect(report.totalTestVectors).toBe(19)
+    expect(report.totalTestVectors).toBe(18)
     expect(report.totalJunitTestCases).toBe(7)
     expect(report.specTestCases).toBe(6)
     expect(report.specFailedTestCases).toBe(0)
     expect(report.specPassedTestCases).toBe(6)
-    expect(report.missingVectors).toHaveLength(13)
+    expect(report.missingVectors).toHaveLength(12)
     expect(report.failedVectors).toHaveLength(0)
     expect(report.skippedVectors).toHaveLength(0)
     expect(report.successVectors).toEqual([
@@ -144,12 +144,12 @@ describe('test-vectors', () => {
     expect(parseJunitTestCasesMock).toHaveBeenCalledWith(swiftJunitFiles)
 
     expect(report.totalJunitFiles).toBe(1)
-    expect(report.totalTestVectors).toBe(19)
+    expect(report.totalTestVectors).toBe(18)
     expect(report.totalJunitTestCases).toBe(113)
     expect(report.specTestCases).toBe(7)
     expect(report.specFailedTestCases).toBe(0)
     expect(report.specPassedTestCases).toBe(7)
-    expect(report.missingVectors).toHaveLength(12)
+    expect(report.missingVectors).toHaveLength(11)
     expect(report.failedVectors).toHaveLength(0)
     expect(report.skippedVectors).toHaveLength(0)
     expect(report.successVectors).toEqual([

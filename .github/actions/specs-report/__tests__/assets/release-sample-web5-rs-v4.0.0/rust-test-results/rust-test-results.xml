@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="nextest-run" tests="5" failures="0" errors="0" uuid="61844954-cd1d-4fb5-9ffd-557c631f6cad" timestamp="2024-09-25T22:01:13.899+00:00" time="0.036">
+    <testsuite name="Web5TestVectorsProtocolTest" tests="5" disabled="0" errors="0" failures="0">
+        <testcase name="test_vectors::test_vectors::crypto_ed25519::sign" classname="web5" timestamp="2024-09-25T22:01:13.902+00:00" time="0.019">
+            <system-out>
+running 1 test
+test test_vectors::test_vectors::crypto_ed25519::sign ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="test_vectors::test_vectors::crypto_ed25519::verify" classname="web5" timestamp="2024-09-25T22:01:13.904+00:00" time="0.019">
+            <system-out>
+running 1 test
+test test_vectors::test_vectors::crypto_ed25519::verify ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.01s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="test_vectors::test_vectors::credentials::verify" classname="web5" timestamp="2024-09-25T22:01:13.901+00:00" time="0.026">
+            <system-out>
+running 1 test
+test test_vectors::test_vectors::credentials::verify ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.01s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="test_vectors::test_vectors::did_dht::resolve" classname="web5" timestamp="2024-09-25T22:01:13.921+00:00" time="0.012">
+            <system-out>
+running 1 test
+test test_vectors::test_vectors::did_dht::resolve ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="test_vectors::test_vectors::did_jwk::resolve" classname="web5" timestamp="2024-09-25T22:01:13.923+00:00" time="0.012">
+            <system-out>
+running 1 test
+test test_vectors::test_vectors::did_jwk::resolve ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+    </testsuite>
+</testsuites>

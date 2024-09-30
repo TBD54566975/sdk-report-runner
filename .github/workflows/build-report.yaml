@@ -1,6 +1,8 @@
 name: Build and Deploy
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 permissions:
   contents: write
@@ -43,3 +45,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _site # The folder the action should deploy.
+          # keep the conformance json files
+          clean-exclude: |
+            spec-conformance*.json
