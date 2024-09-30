@@ -1,7 +1,7 @@
 {
   "specReleases": [
     {
-      "version": "v0.3.1-alpha",
+      "version": "v0.3.1-alpha-leordev",
       "releaseLink": "https://github.com/TBD54566975/web5-spec/releases/tag/v0.3.1-alpha",
       "testVectors": {
         "srcLink": "https://github.com/TBD54566975/web5-spec/tree/v0.3.1-alpha/test-vectors",
