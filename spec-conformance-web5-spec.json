@@ -44,7 +44,37 @@
           ]
         }
       },
-      "sdks": {}
+      "sdks": {
+        "web5-rs": {
+          "version": "v4.0.0",
+          "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "casesReport": {
+            "CryptoEd25519": {
+              "sign": {
+                "status": "passed"
+              },
+              "verify": {
+                "status": "passed"
+              }
+            },
+            "Credentials": {
+              "verify": {
+                "status": "passed"
+              }
+            },
+            "DidDht": {
+              "resolve": {
+                "status": "passed"
+              }
+            },
+            "DidJwk": {
+              "resolve": {
+                "status": "passed"
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }
