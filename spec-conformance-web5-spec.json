@@ -73,6 +73,25 @@
               }
             }
           }
+        },
+        "web5-core-kt": {
+          "version": "v4.0.0",
+          "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "casesReport": {
+            "CryptoEd25519": {
+              "verify": {
+                "status": "passed"
+              },
+              "sign": {
+                "status": "passed"
+              }
+            },
+            "DidJwk": {
+              "resolve": {
+                "status": "passed"
+              }
+            }
+          }
         }
       }
     }
