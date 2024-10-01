@@ -12,7 +12,7 @@ export const handleCIReport = async (inputs: ActionInputs): Promise<void> => {
     suiteRegexStrFilters,
     gitToken,
     commentOnPr,
-    commentPackage,
+    packageName,
     failOnMissingVectors,
     failOnFailedTestCases
   } = inputs
@@ -25,10 +25,10 @@ export const handleCIReport = async (inputs: ActionInputs): Promise<void> => {
     suiteRegexStrFilters
   )
 
-  const summary = generateSummary(report)
+  const summary = generateSummary(report, packageName)
 
   if (commentOnPr) {
-    await addCommentToPr(summary, gitToken, commentPackage)
+    await addCommentToPr(summary, gitToken)
   }
 
   setCIJobStatus(report, failOnMissingVectors, failOnFailedTestCases)

@@ -38316,7 +38316,7 @@ const readActionInputs = () => {
         prettifyFeature: core.getInput('prettify-feature') === 'true'
     };
     const commentOnPr = core.getInput('comment-on-pr') === 'true';
-    const commentPackage = core.getInput('comment-package') || '';
+    const packageName = core.getInput('package-name') || '';
     const gitToken = core.getInput('git-token', {
         required: commentOnPr || isReleaseMode
     });
@@ -38343,7 +38343,7 @@ const readActionInputs = () => {
         suiteRegexStrFilters,
         gitToken,
         commentOnPr,
-        commentPackage,
+        packageName,
         failOnMissingVectors,
         failOnFailedTestCases,
         releaseMode,
@@ -38395,12 +38395,12 @@ const test_vectors_1 = __nccwpck_require__(7465);
 const summary_report_1 = __nccwpck_require__(3129);
 const pr_comment_1 = __nccwpck_require__(604);
 const handleCIReport = async (inputs) => {
-    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, commentPackage, failOnMissingVectors, failOnFailedTestCases } = inputs;
+    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, packageName, failOnMissingVectors, failOnFailedTestCases } = inputs;
     const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
     const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
-    const summary = (0, summary_report_1.generateSummary)(report);
+    const summary = (0, summary_report_1.generateSummary)(report, packageName);
     if (commentOnPr) {
-        await (0, pr_comment_1.addCommentToPr)(summary, gitToken, commentPackage);
+        await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
     }
     setCIJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
 };
@@ -38652,7 +38652,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.addCommentToPr = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
-const addCommentToPr = async (summary, gitToken, commentPackage) => {
+const addCommentToPr = async (summary, gitToken) => {
     const event = github.context.eventName;
     if (event !== 'pull_request' || !github.context.payload.pull_request) {
         core.info('Not a PR event, skipping comment...');
@@ -38673,10 +38673,7 @@ const addCommentToPr = async (summary, gitToken, commentPackage) => {
         repo,
         issue_number: prNumber
     });
-    const finalSummary = commentPackage
-        ? `${commentPackage}: ${summary}`
-        : summary;
-    const summaryHeader = finalSummary.split('\n')[0];
+    const summaryHeader = summary.split('\n')[0];
     const existingComment = comments.data.find(({ user, body }) => body?.includes(summaryHeader) && user?.type === 'Bot');
     if (existingComment) {
         core.info('Existing comment found, updating...');
@@ -38684,7 +38681,7 @@ const addCommentToPr = async (summary, gitToken, commentPackage) => {
             owner,
             repo,
             comment_id: existingComment.id,
-            body: finalSummary
+            body: summary
         });
         core.info(`Comment updated ${existingComment.html_url}`);
     }
@@ -38694,7 +38691,7 @@ const addCommentToPr = async (summary, gitToken, commentPackage) => {
             owner,
             repo,
             issue_number: prNumber,
-            body: finalSummary
+            body: summary
         });
         core.info(`Comment created ${createdComment.html_url}`);
     }
@@ -38920,9 +38917,12 @@ const SUMMARY_HEADER = 'TBD Spec Test Vectors Report';
 /**
  * Generates the summary markdown report for the test vector results.
  */
-const generateSummary = (testVectorReport) => {
+const generateSummary = (testVectorReport, packageName) => {
     core.info(`Generating summary... ${JSON.stringify(testVectorReport, null, 2)}`);
-    core.summary.addHeading(SUMMARY_HEADER, 2);
+    const header = packageName
+        ? `${SUMMARY_HEADER} (${packageName})`
+        : SUMMARY_HEADER;
+    core.summary.addHeading(header, 2);
     addOverallStatsTable(testVectorReport);
     const parentDir = process.cwd().split('/').pop() || '';
     addFailedVectorsSection(testVectorReport.failedVectors, parentDir);

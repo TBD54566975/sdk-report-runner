@@ -3,8 +3,7 @@ import * as core from '@actions/core'
 
 export const addCommentToPr = async (
   summary: string,
-  gitToken: string,
-  commentPackage: string
+  gitToken: string
 ): Promise<void> => {
   const event = github.context.eventName
   if (event !== 'pull_request' || !github.context.payload.pull_request) {
@@ -30,12 +29,7 @@ export const addCommentToPr = async (
     repo,
     issue_number: prNumber
   })
-
-  const finalSummary = commentPackage
-    ? `${commentPackage}: ${summary}`
-    : summary
-
-  const summaryHeader = finalSummary.split('\n')[0]
+  const summaryHeader = summary.split('\n')[0]
   const existingComment = comments.data.find(
     ({ user, body }) => body?.includes(summaryHeader) && user?.type === 'Bot'
   )
@@ -46,7 +40,7 @@ export const addCommentToPr = async (
       owner,
       repo,
       comment_id: existingComment.id,
-      body: finalSummary
+      body: summary
     })
     core.info(`Comment updated ${existingComment.html_url}`)
   } else {
@@ -55,7 +49,7 @@ export const addCommentToPr = async (
       owner,
       repo,
       issue_number: prNumber,
-      body: finalSummary
+      body: summary
     })
     core.info(`Comment created ${createdComment.html_url}`)
   }

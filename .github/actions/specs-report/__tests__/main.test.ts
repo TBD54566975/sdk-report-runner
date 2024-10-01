@@ -161,8 +161,7 @@ describe('action', () => {
 
     expect(addCommentToPrMock).toHaveBeenCalledWith(
       output.summary,
-      'fake-token',
-      ''
+      'fake-token'
     )
 
     const expectedReport = {

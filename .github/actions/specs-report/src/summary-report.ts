@@ -7,11 +7,18 @@ const SUMMARY_HEADER = 'TBD Spec Test Vectors Report'
 /**
  * Generates the summary markdown report for the test vector results.
  */
-export const generateSummary = (testVectorReport: TestVectorReport): string => {
+export const generateSummary = (
+  testVectorReport: TestVectorReport,
+  packageName: string
+): string => {
   core.info(
     `Generating summary... ${JSON.stringify(testVectorReport, null, 2)}`
   )
-  core.summary.addHeading(SUMMARY_HEADER, 2)
+
+  const header = packageName
+    ? `${SUMMARY_HEADER} (${packageName})`
+    : SUMMARY_HEADER
+  core.summary.addHeading(header, 2)
 
   addOverallStatsTable(testVectorReport)
 
