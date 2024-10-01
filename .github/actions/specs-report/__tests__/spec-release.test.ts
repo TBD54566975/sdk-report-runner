@@ -1,8 +1,9 @@
 import { handleSdkRelease } from '../src/spec-release'
 import * as specRelease from '../src/spec-release'
 import { ActionInputs } from '../src/action-inputs'
-import mockedSpecConformanceWeb5Spec from './assets/release-sample-web5-rs-v4.0.0/spec-conformance-web5-spec.json'
 import { SuiteRegexStrFilters } from '../src/test-vectors'
+
+import mockedSpecConformanceWeb5Spec from './assets/release-sample-web5-rs-v4.0.0/spec-conformance-web5-spec.json'
 
 // Mock the required modules and functions
 jest.mock('@actions/github')
