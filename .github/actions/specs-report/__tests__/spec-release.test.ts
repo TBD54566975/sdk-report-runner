@@ -31,7 +31,8 @@ describe('handleSdkRelease', () => {
     commentOnPr: false,
     failOnMissingVectors: false,
     failOnFailedTestCases: false,
-    releaseMode: 'sdk'
+    releaseMode: 'sdk',
+    packageName: ''
   }
 
   const mockOctokit = {

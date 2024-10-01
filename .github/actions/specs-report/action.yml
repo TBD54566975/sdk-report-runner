@@ -31,6 +31,9 @@ inputs:
   comment-on-pr:
     description: 'Whether to comment the summary report on the PR'
     required: false
+  comment-package:
+    description: 'The package name to add to the summary header comment'
+    required: false
   git-token:
     description:
       'The git token to add the comment to the PR (required for PR comments)'
