@@ -38316,6 +38316,7 @@ const readActionInputs = () => {
         prettifyFeature: core.getInput('prettify-feature') === 'true'
     };
     const commentOnPr = core.getInput('comment-on-pr') === 'true';
+    const commentPackage = core.getInput('comment-package') || '';
     const gitToken = core.getInput('git-token', {
         required: commentOnPr || isReleaseMode
     });
@@ -38342,6 +38343,7 @@ const readActionInputs = () => {
         suiteRegexStrFilters,
         gitToken,
         commentOnPr,
+        commentPackage,
         failOnMissingVectors,
         failOnFailedTestCases,
         releaseMode,
@@ -38393,12 +38395,12 @@ const test_vectors_1 = __nccwpck_require__(7465);
 const summary_report_1 = __nccwpck_require__(3129);
 const pr_comment_1 = __nccwpck_require__(604);
 const handleCIReport = async (inputs) => {
-    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, failOnMissingVectors, failOnFailedTestCases } = inputs;
+    const { junitReportPaths, specPath, suiteRegexStrFilters, gitToken, commentOnPr, commentPackage, failOnMissingVectors, failOnFailedTestCases } = inputs;
     const reportFiles = await (0, files_1.getFiles)(junitReportPaths);
     const report = await (0, test_vectors_1.buildTestVectorReport)(specPath, reportFiles, suiteRegexStrFilters);
     const summary = (0, summary_report_1.generateSummary)(report);
     if (commentOnPr) {
-        await (0, pr_comment_1.addCommentToPr)(summary, gitToken);
+        await (0, pr_comment_1.addCommentToPr)(summary, gitToken, commentPackage);
     }
     setCIJobStatus(report, failOnMissingVectors, failOnFailedTestCases);
 };
@@ -38650,7 +38652,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.addCommentToPr = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
-const addCommentToPr = async (summary, gitToken) => {
+const addCommentToPr = async (summary, gitToken, commentPackage) => {
     const event = github.context.eventName;
     if (event !== 'pull_request' || !github.context.payload.pull_request) {
         core.info('Not a PR event, skipping comment...');
@@ -38671,7 +38673,10 @@ const addCommentToPr = async (summary, gitToken) => {
         repo,
         issue_number: prNumber
     });
-    const summaryHeader = summary.split('\n')[0];
+    const finalSummary = commentPackage
+        ? `${commentPackage}: ${summary}`
+        : summary;
+    const summaryHeader = finalSummary.split('\n')[0];
     const existingComment = comments.data.find(({ user, body }) => body?.includes(summaryHeader) && user?.type === 'Bot');
     if (existingComment) {
         core.info('Existing comment found, updating...');
@@ -38679,7 +38684,7 @@ const addCommentToPr = async (summary, gitToken) => {
             owner,
             repo,
             comment_id: existingComment.id,
-            body: summary
+            body: finalSummary
         });
         core.info(`Comment updated ${existingComment.html_url}`);
     }
@@ -38689,7 +38694,7 @@ const addCommentToPr = async (summary, gitToken) => {
             owner,
             repo,
             issue_number: prNumber,
-            body: summary
+            body: finalSummary
         });
         core.info(`Comment created ${createdComment.html_url}`);
     }
