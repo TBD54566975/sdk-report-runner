@@ -46,7 +46,7 @@ describe('addCommentToPr', () => {
     github.context.eventName = 'push'
     github.context.payload = {}
 
-    await addCommentToPr('Test summary', 'fake-token')
+    await addCommentToPr('Test summary', 'fake-token', '')
 
     expect(infoMock).toHaveBeenCalledWith('Not a PR event, skipping comment...')
     expect(mockOctokit.rest.issues.listComments).not.toHaveBeenCalled()
@@ -60,7 +60,7 @@ describe('addCommentToPr', () => {
       writable: true
     })
 
-    await addCommentToPr('Test summary', '')
+    await addCommentToPr('Test summary', '', '')
 
     expect(errorMock).toHaveBeenCalledWith(
       'No git token found, skipping comment...'
@@ -85,7 +85,7 @@ describe('addCommentToPr', () => {
     })
 
     const newSummary = 'Header summary\nNew content'
-    await addCommentToPr(newSummary, 'fake-token')
+    await addCommentToPr(newSummary, 'fake-token', '')
 
     expect(mockOctokit.rest.issues.listComments).toHaveBeenCalledWith({
       owner: 'test-owner',
@@ -119,7 +119,7 @@ describe('addCommentToPr', () => {
     mockOctokit.rest.issues.listComments.mockResolvedValue({ data: [] })
 
     const newSummary = 'New summary\nNew content'
-    await addCommentToPr(newSummary, 'fake-token')
+    await addCommentToPr(newSummary, 'fake-token', '')
 
     expect(mockOctokit.rest.issues.listComments).toHaveBeenCalledWith({
       owner: 'test-owner',
@@ -140,5 +140,51 @@ describe('addCommentToPr', () => {
     expect(infoMock).toHaveBeenCalledWith(
       `Comment created ${newComment.html_url}`
     )
+  })
+
+  it('creates a new comment with commentPackage', async () => {
+    mockOctokit.rest.issues.listComments.mockResolvedValue({ data: [] })
+    mockOctokit.rest.issues.createComment.mockResolvedValue({
+      data: {
+        html_url:
+          'https://github.com/test-owner/test-repo/pull/123#issuecomment-789'
+      }
+    })
+
+    const summary = 'Test summary\nContent'
+    const commentPackage = 'TestPackage'
+    await addCommentToPr(summary, 'fake-token', commentPackage)
+
+    expect(mockOctokit.rest.issues.createComment).toHaveBeenCalledWith({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      issue_number: 123,
+      body: `${commentPackage}: ${summary}`
+    })
+  })
+
+  it('updates an existing comment with commentPackage', async () => {
+    const existingComment = {
+      id: 456,
+      body: 'TestPackage: Summary Header\nOld content',
+      user: { type: 'Bot' },
+      html_url:
+        'https://github.com/test-owner/test-repo/pull/123#issuecomment-456'
+    }
+
+    mockOctokit.rest.issues.listComments.mockResolvedValue({
+      data: [existingComment]
+    })
+
+    const summary = 'Summary Header\nNew content'
+    const commentPackage = 'TestPackage'
+    await addCommentToPr(summary, 'fake-token', commentPackage)
+
+    expect(mockOctokit.rest.issues.updateComment).toHaveBeenCalledWith({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      comment_id: 456,
+      body: `${commentPackage}: ${summary}`
+    })
   })
 })

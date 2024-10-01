@@ -15,6 +15,8 @@ export interface ActionInputs {
   gitToken: string
   /** Whether to add the report as a comment to the PR */
   commentOnPr: boolean
+  /** The package name to comment on the PR */
+  commentPackage: string
   /** Whether to fail the job if missing test vectors are found */
   failOnMissingVectors: boolean
   /** Whether to fail the job if failed test cases are found */
@@ -66,6 +68,7 @@ export const readActionInputs = (): ActionInputs => {
   }
 
   const commentOnPr = core.getInput('comment-on-pr') === 'true'
+  const commentPackage = core.getInput('comment-package') || ''
   const gitToken = core.getInput('git-token', {
     required: commentOnPr || isReleaseMode
   })
@@ -97,6 +100,7 @@ export const readActionInputs = (): ActionInputs => {
     suiteRegexStrFilters,
     gitToken,
     commentOnPr,
+    commentPackage,
     failOnMissingVectors,
     failOnFailedTestCases,
     releaseMode,
