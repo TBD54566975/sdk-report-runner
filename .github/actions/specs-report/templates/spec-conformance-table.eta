@@ -1,21 +1,22 @@
 <!-- <%= it.specName %> CONFORMANCE TABLE: BEGIN -->
-<table>
+<table role="grid" aria-label="<%= it.specName %> Conformance Table">
     <thead>
         <tr>
-            <th>Specification</th>
+            <th scope="col">Specification</th>
             <% it.sdksList.forEach(function(sdkName) { %>
-                <th><%= sdkName %></th>
+                <th scope="col"><%= sdkName %></th>
             <% }) %>
         </tr>
     </thead>
     <tbody>
-        <% it.specReleases.forEach(function(spec) { %>
-            <tr>
+        <% it.specReleases.forEach(function(spec, index) { %>
+            <tr class="spec-row" data-spec-index="<%= index %>">
                 <!-- Specification Column -->
-                <td>
-                    <a href="<%= spec.releaseLink %>"><%= spec.version %></a><br/>
-                    <a href="<%= spec.testVectors.srcLink %>">(tests)</a>
-                </td>
+                <th scope="row">
+                    <button class="<%= it.specName %>-expand-collapse-btn spec-conformance-table-expand-collapse-btn" aria-expanded="false">+</button>
+                    <a href="<%= spec.releaseLink %>"><%= spec.version %></a>
+                    <a href="<%= spec.testVectors.srcLink %>" aria-label="Test vectors for <%= spec.version %>">(tests)</a>
+                </th>
 
                 <!-- SDK Columns -->
                 <% it.sdksList.forEach(function(sdkName) { %>
@@ -23,14 +24,51 @@
                     <% if (sdk) { %>
                         <td>
                         <a href="<%= sdk.releaseLink %>"><%= sdk.version %></a>
-                        <span>&nbsp;<%= it.getStatusIcon(sdk.status) %></span>
+                        <span aria-label="Status: <%= sdk.status %>">&nbsp;<%= it.getStatusIcon(sdk.status) %></span>
                         </td>
                     <% } else { %>
-                        <td>-</td>
+                        <td aria-label="No data available">-</td>
                     <% } %>
                 <% }) %>
             </tr>
+            <% Object.keys(spec.testVectors.cases).forEach(function(testCaseFeature) { %>
+                <% spec.testVectors.cases[testCaseFeature].forEach(function(testCaseVector) { %>
+                    <tr id="<%= it.specName %>-detail-row-<%= index %>-<%= testCaseFeature %>-<%= testCaseVector %>" style="display: none;">
+                        <th><%= testCaseFeature %> <%= testCaseVector %></th>
+                        <% it.sdksList.forEach(function(sdkName) { %>
+                            <% var sdk = spec.sdks[sdkName] %>
+                            <% if (sdk && sdk.casesReport && sdk.casesReport[testCaseFeature]?.[testCaseVector]) { %>
+                                <td><%= it.getStatusIcon(sdk.casesReport[testCaseFeature][testCaseVector].status) %></td>
+                            <% } else { %>
+                                <td>-</td>
+                            <% } %>
+                        <% }) %>
+                    </tr>
+                <% }) %>
+            <% }) %>
         <% }) %>
     </tbody>
 </table>
+
+<script>
+document.querySelectorAll('.<%= it.specName %>-expand-collapse-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const specRow = this.closest('.spec-row');
+        
+        const detailRows = document.querySelectorAll(`[id^="<%= it.specName %>-detail-row-${specRow.dataset.specIndex}"]`);
+      
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            this.setAttribute('aria-expanded', 'false');
+            this.textContent = '+';
+            detailRows.forEach(row => row.style.display = 'none');
+        } else {
+            this.setAttribute('aria-expanded', 'true');
+            this.textContent = '-';
+            detailRows.forEach(row => row.style.display = 'table-row');
+        }
+    });
+});
+</script>
 <!-- <%= it.specName %> CONFORMANCE TABLE: END -->

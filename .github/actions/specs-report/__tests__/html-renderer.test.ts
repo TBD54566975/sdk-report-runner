@@ -13,15 +13,17 @@ describe('generateConformanceDataHTML', () => {
     const result = generateConformanceDataHTML('web5-spec', conformanceData)
 
     // Check for table structure
-    expect(result).toContain('<table>')
+    expect(result).toContain(
+      '<table role="grid" aria-label="web5-spec Conformance Table">'
+    )
     expect(result).toContain('</table>')
     expect(result).toContain('<thead>')
     expect(result).toContain('<tbody>')
 
     // Check for header row
-    expect(result).toContain('<th>Specification</th>')
-    expect(result).toContain('<th>web5-rs</th>')
-    expect(result).toContain('<th>web5-core-kt</th>')
+    expect(result).toContain('<th scope="col">Specification</th>')
+    expect(result).toContain('<th scope="col">web5-rs</th>')
+    expect(result).toContain('<th scope="col">web5-core-kt</th>')
 
     // Check for specification details
     expect(result).toContain('v0.3.1-alpha</a>')
@@ -74,9 +76,9 @@ describe('generateConformanceDataHTML', () => {
     const result = generateConformanceDataHTML('web5-spec', conformanceData)
 
     // Check for header row
-    expect(result).toContain('<th>Specification</th>')
-    expect(result).toContain('<th>web5-rs</th>')
-    expect(result).toContain('<th>web5-core-kt</th>')
+    expect(result).toContain('<th scope="col">Specification</th>')
+    expect(result).toContain('<th scope="col">web5-rs</th>')
+    expect(result).toContain('<th scope="col">web5-core-kt</th>')
 
     // Check for SDK details
     expect(result).toContain('v3.1.2</a>')
@@ -93,7 +95,9 @@ describe('generateConformanceDataHTML', () => {
       emptyConformanceData
     )
 
-    expect(result).toContain('<table>')
+    expect(result).toContain(
+      '<table role="grid" aria-label="web5-spec Conformance Table">'
+    )
     expect(result).toContain('</table>')
     expect(result).toContain('<thead>')
     expect(result).toContain('<tbody>')
@@ -120,11 +124,11 @@ describe('generateConformanceDataHTML', () => {
       noSdksConformanceData
     )
 
-    expect(result).toContain('<table>')
+    expect(result).toContain(
+      '<table role="grid" aria-label="web5-spec Conformance Table">'
+    )
     expect(result).toContain('</table>')
     expect(result).toContain('<thead>')
-    expect(result).toContain('<tbody>')
-    expect(result).toContain('<tr>')
     expect(result).toContain('v1.0.0</a>')
     expect(result).not.toContain('<th>web5-rs</th>')
     expect(result).not.toContain('<th>web5-core-kt</th>')

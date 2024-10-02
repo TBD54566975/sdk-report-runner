@@ -1,30 +1,143 @@
 <!-- web5-spec CONFORMANCE TABLE: BEGIN -->
-<table>
+<table role="grid" aria-label="web5-spec Conformance Table">
     <thead>
         <tr>
-            <th>Specification</th>
-                            <th>web5-core-kt</th>
-                            <th>web5-rs</th>
+            <th scope="col">Specification</th>
+                            <th scope="col">web5-core-kt</th>
+                            <th scope="col">web5-rs</th>
                     </tr>
     </thead>
     <tbody>
-                    <tr>
+                    <tr class="spec-row" data-spec-index="0">
                 <!-- Specification Column -->
-                <td>
-                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.3.1-alpha">v0.3.1-alpha</a><br/>
-                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.3.1-alpha/test-vectors">(tests)</a>
-                </td>
+                <th scope="row">
+                    <button class="web5-spec-expand-collapse-btn spec-conformance-table-expand-collapse-btn" aria-expanded="false">+</button>
+                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.3.1-alpha">v0.3.1-alpha</a>
+                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.3.1-alpha/test-vectors" aria-label="Test vectors for v0.3.1-alpha">(tests)</a>
+                </th>
 
                 <!-- SDK Columns -->
                                                                                 <td>
                         <a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a>
-                        <span>&nbsp;🚧</span>
+                        <span aria-label="Status: missing">&nbsp;🚧</span>
                         </td>
                                                                                                     <td>
                         <a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a>
-                        <span>&nbsp;✅</span>
+                        <span aria-label="Status: passed">&nbsp;✅</span>
                         </td>
                                                 </tr>
-            </tbody>
+                                                <tr id="web5-spec-detail-row-0-Credentials-create" style="display: none;">
+                        <th>Credentials create</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-Credentials-verify" style="display: none;">
+                        <th>Credentials verify</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>✅</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-CryptoEd25519-sign" style="display: none;">
+                        <th>CryptoEd25519 sign</th>
+                                                                                                                <td>✅</td>
+                                                                                                                                            <td>✅</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-CryptoEd25519-verify" style="display: none;">
+                        <th>CryptoEd25519 verify</th>
+                                                                                                                <td>✅</td>
+                                                                                                                                            <td>✅</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-CryptoEs256k-sign" style="display: none;">
+                        <th>CryptoEs256k sign</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-CryptoEs256k-verify" style="display: none;">
+                        <th>CryptoEs256k verify</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidDht-create" style="display: none;">
+                        <th>DidDht create</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-DidDht-resolve" style="display: none;">
+                        <th>DidDht resolve</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>✅</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidJwk-resolve" style="display: none;">
+                        <th>DidJwk resolve</th>
+                                                                                                                <td>✅</td>
+                                                                                                                                            <td>✅</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidWeb-resolve" style="display: none;">
+                        <th>DidWeb resolve</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-PortableDid-parse" style="display: none;">
+                        <th>PortableDid parse</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-PresentationExchange-create_presentation_from_credentials" style="display: none;">
+                        <th>PresentationExchange create_presentation_from_credentials</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-evaluate_presentation" style="display: none;">
+                        <th>PresentationExchange evaluate_presentation</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-select_credentials" style="display: none;">
+                        <th>PresentationExchange select_credentials</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-validate_definition" style="display: none;">
+                        <th>PresentationExchange validate_definition</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-validate_submission" style="display: none;">
+                        <th>PresentationExchange validate_submission</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                                                <tr id="web5-spec-detail-row-0-VcJwt-decode" style="display: none;">
+                        <th>VcJwt decode</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                    <tr id="web5-spec-detail-row-0-VcJwt-verify" style="display: none;">
+                        <th>VcJwt verify</th>
+                                                                                                                <td>-</td>
+                                                                                                                                            <td>-</td>
+                                                                        </tr>
+                                        </tbody>
 </table>
+
+<script>
+document.querySelectorAll('.web5-spec-expand-collapse-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const specRow = this.closest('.spec-row');
+        
+        const detailRows = document.querySelectorAll(`[id^="web5-spec-detail-row-${specRow.dataset.specIndex}"]`);
+      
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            this.setAttribute('aria-expanded', 'false');
+            this.textContent = '+';
+            detailRows.forEach(row => row.style.display = 'none');
+        } else {
+            this.setAttribute('aria-expanded', 'true');
+            this.textContent = '-';
+            detailRows.forEach(row => row.style.display = 'table-row');
+        }
+    });
+});
+</script>
 <!-- web5-spec CONFORMANCE TABLE: END -->
