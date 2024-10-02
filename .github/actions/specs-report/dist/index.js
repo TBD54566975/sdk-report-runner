@@ -38730,7 +38730,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.writeSpecConformanceJson = exports.readSpecConformanceJson = exports.extractSdkTestVectorCases = exports.handleSdkRelease = exports.handleSpecRelease = void 0;
+exports.calculateSdkStatus = exports.writeSpecConformanceJson = exports.readSpecConformanceJson = exports.extractSdkTestVectorCases = exports.handleSdkRelease = exports.handleSpecRelease = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
 const test_vectors_1 = __nccwpck_require__(7465);
@@ -38754,11 +38754,13 @@ const handleSdkRelease = async (inputs) => {
     }
     const sdkCasesReport = await (0, exports.extractSdkTestVectorCases)(junitReportPaths, suiteRegexStrFilters);
     core.info(`Extracted SDK test cases:\n${JSON.stringify(sdkCasesReport, null, 2)}`);
+    const status = (0, exports.calculateSdkStatus)(sdkCasesReport, specRelease.testVectors);
     const releaseLink = getReleaseLink(releaseRepo, releaseTag);
     specRelease.sdks[releasePackageName] = {
         version: releaseTag,
         releaseLink,
-        casesReport: sdkCasesReport
+        casesReport: sdkCasesReport,
+        status
     };
     return (0, exports.writeSpecConformanceJson)(releasePackageName, releaseTag, specConformanceJsonFileName, gitToken, data, originalSha);
 };
@@ -38878,6 +38880,29 @@ const writeSpecConformanceJson = async (releaseRepo, releaseTag, specConformance
     }
 };
 exports.writeSpecConformanceJson = writeSpecConformanceJson;
+const calculateSdkStatus = (sdkCasesReport, specReleaseTestVectors) => {
+    let status = 'passed';
+    for (const feature of Object.keys(specReleaseTestVectors.cases)) {
+        const sdkFeatureCases = sdkCasesReport[feature];
+        if (!sdkFeatureCases) {
+            status = 'missing';
+            continue;
+        }
+        const specTestCases = specReleaseTestVectors.cases[feature];
+        for (const specTestCase of specTestCases) {
+            const sdkTestCase = sdkFeatureCases[specTestCase];
+            if (!sdkTestCase) {
+                status = 'missing';
+                continue;
+            }
+            if (sdkTestCase.status !== 'passed') {
+                return 'failed';
+            }
+        }
+    }
+    return status;
+};
+exports.calculateSdkStatus = calculateSdkStatus;
 
 
 /***/ }),

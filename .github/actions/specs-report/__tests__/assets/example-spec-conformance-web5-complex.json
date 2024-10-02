@@ -48,6 +48,7 @@
         "web5-rs": {
           "version": "v4.0.0",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "status": "missing",
           "casesReport": {
             "CryptoEd25519": {
               "sign": {
@@ -77,6 +78,7 @@
         "web5-core-kt": {
           "version": "v4.0.0",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "status": "missing",
           "casesReport": {
             "CryptoEd25519": {
               "verify": {
@@ -129,10 +131,11 @@
         "web5-core-kt": {
           "version": "v3.1.2",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v3.1.2",
+          "status": "failed",
           "casesReport": {
             "CryptoEd25519": {
               "verify": {
-                "status": "passed"
+                "status": "failed"
               },
               "sign": {
                 "status": "passed"
@@ -148,6 +151,7 @@
         "web5-kt": {
           "version": "v2.9.113",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v2.9.113",
+          "status": "passed",
           "casesReport": {
             "CryptoEd25519": {
               "verify": {
@@ -190,6 +194,7 @@
         "web5-kt": {
           "version": "v2.0.1",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v2.0.1",
+          "status": "passed",
           "casesReport": {
             "CryptoEd25519": {
               "verify": {

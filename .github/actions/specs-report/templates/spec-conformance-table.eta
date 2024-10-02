@@ -1,0 +1,36 @@
+<!-- <%= it.specName %> CONFORMANCE TABLE: BEGIN -->
+<table>
+    <thead>
+        <tr>
+            <th>Specification</th>
+            <% it.sdksList.forEach(function(sdkName) { %>
+                <th><%= sdkName %></th>
+            <% }) %>
+        </tr>
+    </thead>
+    <tbody>
+        <% it.specReleases.forEach(function(spec) { %>
+            <tr>
+                <!-- Specification Column -->
+                <td>
+                    <a href="<%= spec.releaseLink %>"><%= spec.version %></a><br/>
+                    <a href="<%= spec.testVectors.srcLink %>">(tests)</a>
+                </td>
+
+                <!-- SDK Columns -->
+                <% it.sdksList.forEach(function(sdkName) { %>
+                    <% var sdk = spec.sdks[sdkName] %>
+                    <% if (sdk) { %>
+                        <td>
+                        <a href="<%= sdk.releaseLink %>"><%= sdk.version %></a>
+                        <span>&nbsp;<%= it.getStatusIcon(sdk.status) %></span>
+                        </td>
+                    <% } else { %>
+                        <td>-</td>
+                    <% } %>
+                <% }) %>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<!-- <%= it.specName %> CONFORMANCE TABLE: END -->

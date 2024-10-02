@@ -1,5 +1,6 @@
 import { generateConformanceDataHTML } from '../src/html-renderer'
 import { ConformanceData } from '../src/spec-release'
+import fs from 'fs'
 
 import exampleConformanceDataSimple from './assets/example-spec-conformance-web5-simple.json'
 import exampleConformanceDataComplex from './assets/example-spec-conformance-web5-complex.json'
@@ -43,165 +44,32 @@ describe('generateConformanceDataHTML', () => {
       exampleConformanceDataSimple as ConformanceData
 
     const result = generateConformanceDataHTML('web5-spec', conformanceData)
-    console.info(result)
 
-    const expectedHTML = `
-<!-- web5-spec CONFORMANCE TABLE: BEGIN -->
-<table>
-    <thead>
-        <tr>
-            <th>Specification</th>
-            
-                <th>web5-core-kt</th>
-            
-                <th>web5-rs</th>
-            
-        </tr>
-    </thead>
-    <tbody>
-        
-            <tr>
-                <!-- Specification Column -->
-                <td>
-                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.3.1-alpha">v0.3.1-alpha</a><br/>
-                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.3.1-alpha/test-vectors">(tests)</a>
-                </td>
-
-                <!-- SDK Columns -->
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a></td>
-                    
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a></td>
-                    
-                
-            </tr>
-        
-    </tbody>
-</table>
-<!-- web5-spec CONFORMANCE TABLE: END -->
-`
+    const expectedHTML = fs.readFileSync(
+      `${__dirname}/assets/example-spec-conformance-table-web5-simple.html`,
+      'utf8'
+    )
 
     expect(result).toBe(expectedHTML)
   })
 
   it('should generate the exact HTML table from Complex conformance data', () => {
     const conformanceData: ConformanceData =
-      exampleConformanceDataComplex as any
+      exampleConformanceDataComplex as unknown as ConformanceData
 
     const result = generateConformanceDataHTML('web5-spec', conformanceData)
-    console.info(result)
 
-    const expectedHTML = `
-<!-- web5-spec CONFORMANCE TABLE: BEGIN -->
-<table>
-    <thead>
-        <tr>
-            <th>Specification</th>
-            
-                <th>web5-core-kt</th>
-            
-                <th>web5-kt</th>
-            
-                <th>web5-rs</th>
-            
-        </tr>
-    </thead>
-    <tbody>
-        
-            <tr>
-                <!-- Specification Column -->
-                <td>
-                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.4-alpha">v0.4-alpha</a><br/>
-                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.4-alpha/test-vectors">(tests)</a>
-                </td>
-
-                <!-- SDK Columns -->
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a></td>
-                    
-                
-                    
-                    
-                        <td>-</td>
-                    
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0">v4.0.0</a></td>
-                    
-                
-            </tr>
-        
-            <tr>
-                <!-- Specification Column -->
-                <td>
-                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.3">v0.3</a><br/>
-                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.3/test-vectors">(tests)</a>
-                </td>
-
-                <!-- SDK Columns -->
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v3.1.2">v3.1.2</a></td>
-                    
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v2.9.113">v2.9.113</a></td>
-                    
-                
-                    
-                    
-                        <td>-</td>
-                    
-                
-            </tr>
-        
-            <tr>
-                <!-- Specification Column -->
-                <td>
-                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v0.2">v0.2</a><br/>
-                    <a href="https://github.com/TBD54566975/web5-spec/tree/v0.2/test-vectors">(tests)</a>
-                </td>
-
-                <!-- SDK Columns -->
-                
-                    
-                    
-                        <td>-</td>
-                    
-                
-                    
-                    
-                        <td><a href="https://github.com/TBD54566975/web5-rs/releases/tag/v2.0.1">v2.0.1</a></td>
-                    
-                
-                    
-                    
-                        <td>-</td>
-                    
-                
-            </tr>
-        
-    </tbody>
-</table>
-<!-- web5-spec CONFORMANCE TABLE: END -->
-`
+    const expectedHTML = fs.readFileSync(
+      `${__dirname}/assets/example-spec-conformance-table-web5-complex.html`,
+      'utf8'
+    )
 
     expect(result).toBe(expectedHTML)
   })
 
   it('should generate correct HTML table with missing SDKs versions', () => {
-    const conformanceData: ConformanceData =
-      exampleConformanceDataComplex as any
+    const conformanceData =
+      exampleConformanceDataComplex as unknown as ConformanceData
 
     const result = generateConformanceDataHTML('web5-spec', conformanceData)
 

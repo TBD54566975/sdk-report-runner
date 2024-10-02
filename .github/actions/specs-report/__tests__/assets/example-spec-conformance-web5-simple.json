@@ -48,6 +48,7 @@
         "web5-rs": {
           "version": "v4.0.0",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "status": "passed",
           "casesReport": {
             "CryptoEd25519": {
               "sign": {
@@ -77,6 +78,7 @@
         "web5-core-kt": {
           "version": "v4.0.0",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
+          "status": "missing",
           "casesReport": {
             "CryptoEd25519": {
               "verify": {
