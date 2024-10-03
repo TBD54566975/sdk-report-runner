@@ -1,8 +1,14 @@
-import { handleSdkRelease } from '../src/spec-release'
+import {
+  handleSdkRelease,
+  calculateSdkStatus,
+  SdkEntryCasesReport,
+  SpecReleaseTestVectors
+} from '../src/spec-release'
 import * as specRelease from '../src/spec-release'
 import { ActionInputs } from '../src/action-inputs'
-import mockedSpecConformanceWeb5Spec from './assets/release-sample-web5-rs-v4.0.0/spec-conformance-web5-spec.json'
 import { SuiteRegexStrFilters } from '../src/test-vectors'
+
+import mockedSpecConformanceWeb5Spec from './assets/release-sample-web5-rs-v4.0.0/spec-conformance-web5-spec.json'
 
 // Mock the required modules and functions
 jest.mock('@actions/github')
@@ -83,7 +89,7 @@ describe('handleSdkRelease', () => {
       feature: 'Web5TestVectorsTest\\$Web5TestVectors(\\w+)',
       vector: '(\\w+)'
     }
-    const expectedCases: specRelease.SdkEntryCasesReport = {
+    const expectedCases: SdkEntryCasesReport = {
       CryptoEd25519: {
         verify: {
           status: 'passed'
@@ -117,7 +123,7 @@ describe('handleSdkRelease', () => {
       extractFeatureOnTestCaseName: true,
       prettifyFeature: true
     }
-    const expectedCases: specRelease.SdkEntryCasesReport = {
+    const expectedCases: SdkEntryCasesReport = {
       CryptoEd25519: {
         verify: {
           status: 'passed'
@@ -155,7 +161,7 @@ describe('handleSdkRelease', () => {
     releasePackageName: string,
     junitPath: string,
     suiteRegexStrFilters: SuiteRegexStrFilters,
-    expectedCases: specRelease.SdkEntryCasesReport
+    expectedCases: SdkEntryCasesReport
   ): Promise<boolean> => {
     const junitReportPaths = `${mockedJUnitReportPathsBase}/${junitPath}`
     await handleSdkRelease({
@@ -191,7 +197,8 @@ describe('handleSdkRelease', () => {
                 version: 'v4.0.0',
                 releaseLink:
                   'https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0',
-                casesReport: expectedCases
+                casesReport: expectedCases,
+                status: 'missing'
               }
             }
           }
@@ -209,5 +216,139 @@ describe('handleSdkRelease', () => {
     await expect(handleSdkRelease(invalidInputs)).rejects.toThrow(
       'Spec release v2.0.0 not found in conformance JSON yet. Are you sure you released the spec or have the right spec version?'
     )
+  })
+})
+
+describe('calculateSdkStatus', () => {
+  it('should return "passed" when all test cases are passed', () => {
+    const sdkCasesReport: SdkEntryCasesReport = {
+      CryptoEd25519: {
+        sign: { status: 'passed' },
+        verify: { status: 'passed' }
+      },
+      DidJwk: {
+        resolve: { status: 'passed' }
+      }
+    }
+
+    const specReleaseTestVectors: SpecReleaseTestVectors = {
+      srcLink: 'https://example.com',
+      cases: {
+        CryptoEd25519: ['sign', 'verify'],
+        DidJwk: ['resolve']
+      }
+    }
+
+    const result = calculateSdkStatus(sdkCasesReport, specReleaseTestVectors)
+    expect(result).toBe('passed')
+  })
+
+  it('should return "failed" when at least one test case fails', () => {
+    const sdkCasesReport: SdkEntryCasesReport = {
+      CryptoEd25519: {
+        sign: { status: 'passed' },
+        verify: { status: 'failed' }
+      },
+      DidJwk: {
+        resolve: { status: 'passed' }
+      }
+    }
+
+    const specReleaseTestVectors: SpecReleaseTestVectors = {
+      srcLink: 'https://example.com',
+      cases: {
+        CryptoEd25519: ['sign', 'verify'],
+        DidJwk: ['resolve']
+      }
+    }
+
+    const result = calculateSdkStatus(sdkCasesReport, specReleaseTestVectors)
+    expect(result).toBe('failed')
+  })
+
+  it('should return "missing" when some test cases are not implemented', () => {
+    const sdkCasesReport: SdkEntryCasesReport = {
+      CryptoEd25519: {
+        sign: { status: 'passed' },
+        verify: { status: 'passed' }
+      }
+    }
+
+    const specReleaseTestVectors: SpecReleaseTestVectors = {
+      srcLink: 'https://example.com',
+      cases: {
+        CryptoEd25519: ['sign', 'verify'],
+        DidJwk: ['resolve']
+      }
+    }
+
+    const result = calculateSdkStatus(sdkCasesReport, specReleaseTestVectors)
+    expect(result).toBe('missing')
+  })
+
+  it('should return "missing" when a feature is completely missing', () => {
+    const sdkCasesReport: SdkEntryCasesReport = {
+      CryptoEd25519: {
+        sign: { status: 'passed' },
+        verify: { status: 'passed' }
+      }
+    }
+
+    const specReleaseTestVectors: SpecReleaseTestVectors = {
+      srcLink: 'https://example.com',
+      cases: {
+        CryptoEd25519: ['sign', 'verify'],
+        DidJwk: ['resolve'],
+        DidWeb: ['resolve']
+      }
+    }
+
+    const result = calculateSdkStatus(sdkCasesReport, specReleaseTestVectors)
+    expect(result).toBe('missing')
+  })
+
+  it('should handle complex scenarios correctly', () => {
+    const sdkCasesReport: SdkEntryCasesReport = {
+      CryptoEd25519: {
+        sign: { status: 'passed' },
+        verify: { status: 'passed' }
+      },
+      Credentials: {
+        verify: { status: 'passed' }
+      },
+      DidDht: {
+        resolve: { status: 'passed' }
+      },
+      DidJwk: {
+        resolve: { status: 'passed' }
+      }
+    }
+
+    const specReleaseTestVectors: specRelease.SpecReleaseTestVectors = {
+      srcLink: 'https://example.com',
+      cases: {
+        Credentials: ['create', 'verify'],
+        CryptoEd25519: ['sign', 'verify'],
+        CryptoEs256k: ['sign', 'verify'],
+        DidDht: ['create', 'resolve'],
+        DidJwk: ['resolve'],
+        DidWeb: ['resolve'],
+        PortableDid: ['parse'],
+        PresentationExchange: [
+          'create_presentation_from_credentials',
+          'evaluate_presentation',
+          'select_credentials',
+          'validate_definition',
+          'validate_submission'
+        ],
+        VcJwt: ['decode', 'verify']
+      }
+    }
+
+    const result = specRelease.calculateSdkStatus(
+      sdkCasesReport,
+      specReleaseTestVectors
+    )
+    expect(result).toBe('missing')
   })
 })

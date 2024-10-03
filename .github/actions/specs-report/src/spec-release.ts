@@ -32,10 +32,13 @@ export interface SdkTestResult {
 
 export type SdkEntryCasesReport = Record<string, Record<string, SdkTestResult>>
 
-interface SdkEntry {
+export type SdkAggregatedStatus = 'passed' | 'failed' | 'missing'
+
+export interface SdkEntry {
   version: string
   releaseLink: string
   casesReport: SdkEntryCasesReport
+  status: SdkAggregatedStatus
 }
 
 export interface ConformanceData {
@@ -103,11 +106,14 @@ export const handleSdkRelease = async (inputs: ActionInputs): Promise<void> => {
     `Extracted SDK test cases:\n${JSON.stringify(sdkCasesReport, null, 2)}`
   )
 
+  const status = calculateSdkStatus(sdkCasesReport, specRelease.testVectors)
+
   const releaseLink = getReleaseLink(releaseRepo, releaseTag)
   specRelease.sdks[releasePackageName] = {
     version: releaseTag,
     releaseLink,
-    casesReport: sdkCasesReport
+    casesReport: sdkCasesReport,
+    status
   }
 
   return writeSpecConformanceJson(
@@ -288,4 +294,33 @@ export const writeSpecConformanceJson = async (
   } else {
     core.info(`Test mode, skipping write to ${specConformanceJsonFileName}...`)
   }
+}
+
+export const calculateSdkStatus = (
+  sdkCasesReport: SdkEntryCasesReport,
+  specReleaseTestVectors: SpecReleaseTestVectors
+): SdkAggregatedStatus => {
+  let status: SdkAggregatedStatus = 'passed'
+  for (const feature of Object.keys(specReleaseTestVectors.cases)) {
+    const sdkFeatureCases = sdkCasesReport[feature]
+    if (!sdkFeatureCases) {
+      status = 'missing'
+      continue
+    }
+
+    const specTestCases = specReleaseTestVectors.cases[feature]
+    for (const specTestCase of specTestCases) {
+      const sdkTestCase = sdkFeatureCases[specTestCase]
+      if (!sdkTestCase) {
+        status = 'missing'
+        continue
+      }
+
+      if (sdkTestCase.status !== 'passed') {
+        return 'failed'
+      }
+    }
+  }
+
+  return status
 }

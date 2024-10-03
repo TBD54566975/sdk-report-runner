@@ -6,13 +6,31 @@
       "testVectors": {
         "srcLink": "https://github.com/TBD54566975/web5-spec/tree/v0.3.1-alpha/test-vectors",
         "cases": {
-          "Credentials": ["create", "verify"],
-          "CryptoEd25519": ["sign", "verify"],
-          "CryptoEs256k": ["sign", "verify"],
-          "DidDht": ["create", "resolve"],
-          "DidJwk": ["resolve"],
-          "DidWeb": ["resolve"],
-          "PortableDid": ["parse"],
+          "Credentials": [
+            "create",
+            "verify"
+          ],
+          "CryptoEd25519": [
+            "sign",
+            "verify"
+          ],
+          "CryptoEs256k": [
+            "sign",
+            "verify"
+          ],
+          "DidDht": [
+            "create",
+            "resolve"
+          ],
+          "DidJwk": [
+            "resolve"
+          ],
+          "DidWeb": [
+            "resolve"
+          ],
+          "PortableDid": [
+            "parse"
+          ],
           "PresentationExchange": [
             "create_presentation_from_credentials",
             "evaluate_presentation",
@@ -20,14 +38,17 @@
             "validate_definition",
             "validate_submission"
           ],
-          "VcJwt": ["decode", "verify"]
+          "VcJwt": [
+            "decode",
+            "verify"
+          ]
         }
       },
       "sdks": {
         "web5-rs": {
           "version": "v4.0.0",
           "releaseLink": "https://github.com/TBD54566975/web5-rs/releases/tag/v4.0.0",
-          "status": "missing",
+          "status": "passed",
           "casesReport": {
             "CryptoEd25519": {
               "sign": {
