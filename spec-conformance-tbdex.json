@@ -1,0 +1,26 @@
+{
+  "specReleases": [
+    {
+      "version": "v1.3.0",
+      "releaseLink": "https://github.com/TBD54566975/tbdex/releases/tag/v1.3.0",
+      "testVectors": {
+        "srcLink": "https://github.com/TBD54566975/tbdex/tree/v1.3.0/test-vectors",
+        "cases": {
+          "Protocol": [
+            "parse_balance",
+            "parse_cancel",
+            "parse_close",
+            "parse_offering",
+            "parse_order",
+            "parse_orderinstructions",
+            "parse_orderstatus",
+            "parse_quote",
+            "parse_rfq_omit_private_data",
+            "parse_rfq"
+          ]
+        }
+      },
+      "sdks": {}
+    }
+  ]
+}
