@@ -1,4 +1,5 @@
 import { Eta } from 'eta'
+import path from 'path'
 import * as core from '@actions/core'
 
 import { ConformanceData, SdkAggregatedStatus } from './spec-release'
@@ -113,8 +114,8 @@ export const generateConformanceDataHTML = (
   const sdksList = Array.from(sdksSet)
   sdksList.sort()
 
-  const eta = new Eta({ views: './templates' })
-  return eta.render('spec-conformance-table.eta', {
+  const eta = new Eta({ views: path.join(__dirname, 'templates') })
+  return eta.render('./spec-conformance-table', {
     specName,
     specReleases,
     sdksList,

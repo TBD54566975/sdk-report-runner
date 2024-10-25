@@ -38609,9 +38609,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateConformanceDataHTML = exports.handleHtmlReleaseMatrixWrite = void 0;
 const eta_1 = __nccwpck_require__(469);
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(2186));
 const gh_utils_1 = __nccwpck_require__(1193);
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN = '<!-- spec-releases-matrix-begin -->';
@@ -38674,8 +38678,8 @@ const generateConformanceDataHTML = (specName, data) => {
     }
     const sdksList = Array.from(sdksSet);
     sdksList.sort();
-    const eta = new eta_1.Eta({ views: './templates' });
-    return eta.render('spec-conformance-table.eta', {
+    const eta = new eta_1.Eta({ views: path_1.default.join(__dirname, 'templates') });
+    return eta.render('./spec-conformance-table', {
         specName,
         specReleases,
         sdksList,
