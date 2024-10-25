@@ -1,4 +1,3 @@
-import * as github from '@actions/github'
 import * as core from '@actions/core'
 
 import {
@@ -7,6 +6,7 @@ import {
   SuiteRegexStrFilters,
   TestVector
 } from './test-vectors'
+import { readGhPagesFile, writeGhPagesFile } from './gh-utils'
 import { ActionInputs } from './action-inputs'
 import { getFiles } from './files'
 import { parseJunitTestSuites, TestCase } from './junit-handler'
@@ -235,32 +235,24 @@ export const readSpecConformanceJson = async (
   specConformanceJsonFileName: string,
   gitToken: string
 ): Promise<ConformanceDataFile> => {
+  const ghPagesFile = await readGhPagesFile(
+    specConformanceJsonFileName,
+    gitToken
+  )
+
+  if (!ghPagesFile) {
+    const initialConformanceData = { data: { specReleases: [] } }
+    core.warning(
+      `Conformance dashboard JSON file not found, initializing new conformance JSON ${initialConformanceData}...`
+    )
+    return initialConformanceData
+  }
+
   try {
-    const reportRepo = github.context.repo
-    const octokit = github.getOctokit(gitToken)
-    const { data: fileData } = await octokit.rest.repos.getContent({
-      owner: reportRepo.owner,
-      repo: reportRepo.repo,
-      path: specConformanceJsonFileName,
-      ref: 'gh-pages'
-    })
-    if ('content' in fileData) {
-      const content = Buffer.from(fileData.content, 'base64').toString('utf-8')
-      const data: ConformanceData = JSON.parse(content)
-      return { data, sha: fileData.sha }
-    } else {
-      throw new Error('Unexpected response format')
-    }
+    const data: ConformanceData = JSON.parse(ghPagesFile.content)
+    return { data, sha: ghPagesFile.sha }
   } catch (error) {
-    if ((error as { status: number }).status === 404) {
-      const initialConformanceData = { data: { specReleases: [] } }
-      core.warning(
-        `Conformance dashboard JSON file not found, initializing new conformance JSON ${initialConformanceData}...`
-      )
-      return initialConformanceData
-    }
-    core.error(`Conformance dashboard read failure: ${error}`)
-    throw error
+    throw new Error(`Failed to parse conformance JSON: ${error}`)
   }
 }
 
@@ -276,24 +268,13 @@ export const writeSpecConformanceJson = async (
   core.info(
     `Writing spec conformance ${specConformanceJsonFileName}:\n${conformanceJsonString}`
   )
-
-  const isTest = process.env.SKIP_WRITE_CONFORMANCE_JSON === 'true'
-
-  if (!isTest) {
-    const reportRepo = github.context.repo
-    const octokit = github.getOctokit(gitToken)
-    await octokit.rest.repos.createOrUpdateFileContents({
-      owner: reportRepo.owner,
-      repo: reportRepo.repo,
-      path: specConformanceJsonFileName,
-      message: `[ci] Update ${specConformanceJsonFileName}: ${releaseRepo}@${releaseTag}`,
-      content: Buffer.from(conformanceJsonString).toString('base64'),
-      sha: originalSha,
-      branch: 'gh-pages'
-    })
-  } else {
-    core.info(`Test mode, skipping write to ${specConformanceJsonFileName}...`)
-  }
+  return writeGhPagesFile(
+    specConformanceJsonFileName,
+    conformanceJsonString,
+    gitToken,
+    `[ci] Update ${specConformanceJsonFileName}: ${releaseRepo}@${releaseTag}`,
+    originalSha
+  )
 }
 
 export const calculateSdkStatus = (

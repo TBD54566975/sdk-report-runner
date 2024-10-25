@@ -1,11 +1,85 @@
-import { generateConformanceDataHTML } from '../src/html-renderer'
+import {
+  generateConformanceDataHTML,
+  handleHtmlReleaseMatrixWrite
+} from '../src/html-renderer'
 import { ConformanceData } from '../src/spec-release'
+
+import * as ghUtils from '../src/gh-utils'
 import fs from 'fs'
 
 import exampleConformanceDataSimple from './assets/example-spec-conformance-web5-simple.json'
 import exampleConformanceDataComplex from './assets/example-spec-conformance-web5-complex.json'
+import tbdexSpecConformanceDataEmpty from './assets/example-spec-conformance-tbdex-empty.json'
+
+// Mock Octokit
+const mockOctokit = {
+  rest: {
+    repos: {
+      createOrUpdateFileContents: jest.fn(),
+      getContent: jest.fn()
+    }
+  }
+}
+
+jest.mock('@actions/github', () => ({
+  getOctokit: jest.fn().mockImplementation(() => mockOctokit),
+  context: {
+    eventName: 'pull_request',
+    payload: { pull_request: { number: 123 } },
+    repo: { owner: 'TBD54566975', repo: 'sdk-report-runner' }
+  }
+}))
 
 describe('generateConformanceDataHTML', () => {
+  it('should generate the final HTML with the spec releases matrix', async () => {
+    const indexSourceHtml = fs.readFileSync(
+      `${__dirname}/assets/report-index-sample.html`,
+      'utf8'
+    )
+
+    const expectedFinalHtml = fs.readFileSync(
+      `${__dirname}/assets/expected-report-index-with-matrix.html`,
+      'utf8'
+    )
+
+    const tbdexSpecConformanceData =
+      tbdexSpecConformanceDataEmpty as unknown as ConformanceData
+
+    const web5SpecConformanceData =
+      exampleConformanceDataComplex as unknown as ConformanceData
+
+    // mock the gh-utils/readGhPagesFile 3 times
+    // 1. for the index.html
+    // 2. for the web5-spec conformance data
+    // 3. for the tbdex conformance data
+    jest
+      .spyOn(ghUtils, 'readGhPagesFile')
+      .mockImplementationOnce(async () => ({
+        content: indexSourceHtml,
+        sha: 'mockSha'
+      }))
+      .mockImplementationOnce(async () => ({
+        content: JSON.stringify(web5SpecConformanceData),
+        sha: 'mockSha'
+      }))
+      .mockImplementationOnce(async () => ({
+        content: JSON.stringify(tbdexSpecConformanceData),
+        sha: 'mockSha'
+      }))
+
+    const writeGhPagesFileMock = jest.spyOn(ghUtils, 'writeGhPagesFile')
+
+    await handleHtmlReleaseMatrixWrite('mockGitToken', 'index.html')
+
+    expect(writeGhPagesFileMock).toHaveBeenCalledWith(
+      'index.html',
+      expectedFinalHtml,
+      'mockGitToken',
+      'Update Spec Releases Conformance Matrix',
+      'mockSha'
+    )
+  })
+
   it('should generate correct HTML table from conformance data', () => {
     const conformanceData: ConformanceData =
       exampleConformanceDataSimple as ConformanceData

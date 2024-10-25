@@ -20,6 +20,7 @@ var (
 	htmlTemplates = htmltemplate.New("")
 	funcmap       = map[string]any{
 		"sanatizeHTML": sanatizeHTML,
+		"renderHTML": func(s string) htmltemplate.HTML { return htmltemplate.HTML(s) },
 	}
 )
 
