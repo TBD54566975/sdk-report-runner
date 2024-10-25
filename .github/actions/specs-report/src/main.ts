@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
     const { releaseMode } = inputs
 
     if (inputs.htmlReportWrite) {
-      await handleHtmlReleaseMatrixWrite(inputs.gitToken)
+      await handleHtmlReleaseMatrixWrite(inputs.gitToken, inputs.htmlReportFile)
     } else if (releaseMode === 'none') {
       await handleCIReport(inputs)
     } else if (releaseMode === 'spec') {

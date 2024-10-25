@@ -8,9 +8,10 @@ const SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN =
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_END = '<!-- spec-releases-matrix-end -->'
 
 export const handleHtmlReleaseMatrixWrite = async (
-  gitToken: string
+  gitToken: string,
+  htmlReportFile: string
 ): Promise<void> => {
-  const indexFile = await readGhPagesFile('index.html', gitToken)
+  const indexFile = await readGhPagesFile(htmlReportFile, gitToken)
   if (!indexFile) {
     throw new Error('Index file not found')
   }

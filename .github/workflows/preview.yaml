@@ -46,3 +46,10 @@ jobs:
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto
+      - name: Update Spec Releases Conformance Matrix Dashboard
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@leordev/spec-releases-matrix # todo: adjust
+        if: github.event.action != 'closed'
+        with:
+          git-token: ${{ secrets.GITHUB_TOKEN }}
+          html-report-write-mode: true
+          html-report-file: pr-preview/pr-${{ github.event.pull_request.number }}/index.html

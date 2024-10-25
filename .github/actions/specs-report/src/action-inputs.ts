@@ -35,6 +35,8 @@ export interface ActionInputs {
   specTag: string
   /** Whether to write the report to the HTML file */
   htmlReportWrite: boolean
+  /** The path to the HTML file to write the report to (useful for PR previews) */
+  htmlReportFile: string
 }
 
 /**
@@ -97,6 +99,8 @@ export const readActionInputs = (): ActionInputs => {
     required: isReleaseSdkMode
   })
 
+  const htmlReportFile = core.getInput('html-report-file') || 'index.html'
+
   return {
     junitReportPaths,
     specPath,
@@ -112,6 +116,7 @@ export const readActionInputs = (): ActionInputs => {
     releasePackageName,
     specName,
     specTag,
-    htmlReportWrite
+    htmlReportWrite,
+    htmlReportFile
   }
 }

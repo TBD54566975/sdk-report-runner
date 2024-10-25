@@ -73,6 +73,10 @@ inputs:
     description: 'Set to "true" to write the report to the HTML file'
     required: false
     default: 'false'
+  html-report-file:
+    description:
+      'The path to the HTML file to write the report to (useful for PR previews)'
+    required: false
 
 # Define your outputs here.
 outputs:

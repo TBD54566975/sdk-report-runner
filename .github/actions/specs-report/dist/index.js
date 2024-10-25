@@ -38338,6 +38338,7 @@ const readActionInputs = () => {
     const releasePackageName = core.getInput('release-package-name', {
         required: isReleaseSdkMode
     });
+    const htmlReportFile = core.getInput('html-report-file') || 'index.html';
     return {
         junitReportPaths,
         specPath,
@@ -38353,7 +38354,8 @@ const readActionInputs = () => {
         releasePackageName,
         specName,
         specTag,
-        htmlReportWrite
+        htmlReportWrite,
+        htmlReportFile
     };
 };
 exports.readActionInputs = readActionInputs;
@@ -38587,8 +38589,8 @@ const eta_1 = __nccwpck_require__(469);
 const gh_utils_1 = __nccwpck_require__(1193);
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN = '<!-- spec-releases-matrix-begin -->';
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_END = '<!-- spec-releases-matrix-end -->';
-const handleHtmlReleaseMatrixWrite = async (gitToken) => {
-    const indexFile = await (0, gh_utils_1.readGhPagesFile)('index.html', gitToken);
+const handleHtmlReleaseMatrixWrite = async (gitToken, htmlReportFile) => {
+    const indexFile = await (0, gh_utils_1.readGhPagesFile)(htmlReportFile, gitToken);
     if (!indexFile) {
         throw new Error('Index file not found');
     }
@@ -38779,7 +38781,7 @@ async function run() {
         const inputs = (0, action_inputs_1.readActionInputs)();
         const { releaseMode } = inputs;
         if (inputs.htmlReportWrite) {
-            await (0, html_renderer_1.handleHtmlReleaseMatrixWrite)(inputs.gitToken);
+            await (0, html_renderer_1.handleHtmlReleaseMatrixWrite)(inputs.gitToken, inputs.htmlReportFile);
         }
         else if (releaseMode === 'none') {
             await (0, ci_1.handleCIReport)(inputs);

@@ -69,7 +69,7 @@ describe('generateConformanceDataHTML', () => {
 
     const writeGhPagesFileMock = jest.spyOn(ghUtils, 'writeGhPagesFile')
 
-    await handleHtmlReleaseMatrixWrite('mockGitToken')
+    await handleHtmlReleaseMatrixWrite('mockGitToken', 'index.html')
 
     expect(writeGhPagesFileMock).toHaveBeenCalledWith(
       'index.html',
