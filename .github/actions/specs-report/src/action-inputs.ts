@@ -49,8 +49,13 @@ export const readActionInputs = (): ActionInputs => {
   const isDefaultReport = releaseMode === 'none' && !htmlReportWrite
   const isReleaseSpecMode = releaseMode === 'spec'
   const isReleaseSdkMode = releaseMode === 'sdk'
-  if (!isReleaseSpecMode && !isReleaseSdkMode && !isDefaultReport) {
-    throw new Error('Invalid release mode')
+  if (
+    !isReleaseSpecMode &&
+    !isReleaseSdkMode &&
+    !isDefaultReport &&
+    !htmlReportWrite
+  ) {
+    throw new Error('Invalid execution mode')
   }
 
   const isReleaseMode = isReleaseSpecMode || isReleaseSdkMode

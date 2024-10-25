@@ -1,4 +1,5 @@
 import { Eta } from 'eta'
+import * as core from '@actions/core'
 
 import { ConformanceData, SdkAggregatedStatus } from './spec-release'
 import { readGhPagesFile, writeGhPagesFile } from './gh-utils'
@@ -38,16 +39,17 @@ export const handleHtmlReleaseMatrixWrite = async (
   `
 
   const finalHtml = insertSpecComplianceReport(cleanHtml, specComplianceReport)
-  return writeFinalHtml(finalHtml, gitToken, indexSha)
+  return writeFinalHtml(htmlReportFile, finalHtml, gitToken, indexSha)
 }
 
 const getConformanceHtmlTable = async (
   specType: 'web5-spec' | 'tbdex',
   gitToken: string
 ): Promise<string> => {
-  const fileName = `./spec-conformance-${specType}.json`
+  const fileName = `spec-conformance-${specType}.json`
   const file = await readGhPagesFile(fileName, gitToken)
   if (!file) {
+    core.warning(`No conformance data found for ${specType} [${fileName}]`)
     return '<p>No data available <em>yet</em>.</p>'
   }
   const conformanceData: ConformanceData = JSON.parse(file.content)
@@ -80,12 +82,13 @@ const insertSpecComplianceReport = (
 }
 
 const writeFinalHtml = async (
+  htmlReportFile: string,
   finalHtml: string,
   gitToken: string,
   originalSha?: string
 ): Promise<void> => {
   return writeGhPagesFile(
-    'index.html',
+    htmlReportFile,
     finalHtml,
     gitToken,
     'Update Spec Releases Conformance Matrix',

@@ -38298,8 +38298,11 @@ const readActionInputs = () => {
     const isDefaultReport = releaseMode === 'none' && !htmlReportWrite;
     const isReleaseSpecMode = releaseMode === 'spec';
     const isReleaseSdkMode = releaseMode === 'sdk';
-    if (!isReleaseSpecMode && !isReleaseSdkMode && !isDefaultReport) {
-        throw new Error('Invalid release mode');
+    if (!isReleaseSpecMode &&
+        !isReleaseSdkMode &&
+        !isDefaultReport &&
+        !htmlReportWrite) {
+        throw new Error('Invalid execution mode');
     }
     const isReleaseMode = isReleaseSpecMode || isReleaseSdkMode;
     const junitReportPaths = core.getInput('junit-report-paths', {
@@ -38579,13 +38582,37 @@ exports.writeGhPagesFile = writeGhPagesFile;
 /***/ }),
 
 /***/ 3867:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateConformanceDataHTML = exports.handleHtmlReleaseMatrixWrite = void 0;
 const eta_1 = __nccwpck_require__(469);
+const core = __importStar(__nccwpck_require__(2186));
 const gh_utils_1 = __nccwpck_require__(1193);
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN = '<!-- spec-releases-matrix-begin -->';
 const SPEC_RELEASES_MATRIX_PLACEHOLDER_END = '<!-- spec-releases-matrix-end -->';
@@ -38612,13 +38639,14 @@ const handleHtmlReleaseMatrixWrite = async (gitToken, htmlReportFile) => {
     <hr/>
   `;
     const finalHtml = insertSpecComplianceReport(cleanHtml, specComplianceReport);
-    return writeFinalHtml(finalHtml, gitToken, indexSha);
+    return writeFinalHtml(htmlReportFile, finalHtml, gitToken, indexSha);
 };
 exports.handleHtmlReleaseMatrixWrite = handleHtmlReleaseMatrixWrite;
 const getConformanceHtmlTable = async (specType, gitToken) => {
-    const fileName = `./spec-conformance-${specType}.json`;
+    const fileName = `spec-conformance-${specType}.json`;
     const file = await (0, gh_utils_1.readGhPagesFile)(fileName, gitToken);
     if (!file) {
+        core.warning(`No conformance data found for ${specType} [${fileName}]`);
         return '<p>No data available <em>yet</em>.</p>';
     }
     const conformanceData = JSON.parse(file.content);
@@ -38632,8 +38660,8 @@ const removeLatestReleaseMatrix = (indexHtml) => {
 const insertSpecComplianceReport = (indexHtml, specComplianceReport) => {
     return indexHtml.replace(SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN, SPEC_RELEASES_MATRIX_PLACEHOLDER_BEGIN + specComplianceReport);
 };
-const writeFinalHtml = async (finalHtml, gitToken, originalSha) => {
-    return (0, gh_utils_1.writeGhPagesFile)('index.html', finalHtml, gitToken, 'Update Spec Releases Conformance Matrix', originalSha);
+const writeFinalHtml = async (htmlReportFile, finalHtml, gitToken, originalSha) => {
+    return (0, gh_utils_1.writeGhPagesFile)(htmlReportFile, finalHtml, gitToken, 'Update Spec Releases Conformance Matrix', originalSha);
 };
 const generateConformanceDataHTML = (specName, data) => {
     const specReleases = data.specReleases;
