@@ -10,7 +10,90 @@
   <body>
     <main>
       <!-- spec-releases-matrix-begin -->
-      <!-- spec-releases-matrix-end -->
+    <hr/>
+    <h1>Spec Releases Compliance Matrix</h1>
+    <hr/>
+
+    <h2>Web5 Spec Releases</h2>
+    <p>No data available <em>yet</em>.</p>
+    <hr/>
+
+    <h2>TBDEX Spec Releases</h2>
+    <!-- tbdex CONFORMANCE TABLE: BEGIN -->
+<table role="grid" aria-label="tbdex Conformance Table">
+    <thead>
+        <tr>
+            <th scope="col">Specification</th>
+                    </tr>
+    </thead>
+    <tbody>
+                    <tr class="spec-row" data-spec-index="0">
+                <!-- Specification Column -->
+                <th scope="row">
+                    <button class="tbdex-expand-collapse-btn spec-conformance-table-expand-collapse-btn" aria-expanded="false">+</button>
+                    <a href="https://github.com/TBD54566975/tbdex/releases/tag/v1.3.0">v1.3.0</a>
+                    <a href="https://github.com/TBD54566975/tbdex/tree/v1.3.0/test-vectors" aria-label="Test vectors for v1.3.0">(tests)</a>
+                </th>
+
+                <!-- SDK Columns -->
+                            </tr>
+                                                <tr id="tbdex-detail-row-0-Protocol-parse_balance" style="display: none;">
+                        <th>Protocol parse_balance</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_cancel" style="display: none;">
+                        <th>Protocol parse_cancel</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_close" style="display: none;">
+                        <th>Protocol parse_close</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_offering" style="display: none;">
+                        <th>Protocol parse_offering</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_order" style="display: none;">
+                        <th>Protocol parse_order</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_orderinstructions" style="display: none;">
+                        <th>Protocol parse_orderinstructions</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_orderstatus" style="display: none;">
+                        <th>Protocol parse_orderstatus</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_quote" style="display: none;">
+                        <th>Protocol parse_quote</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_rfq_omit_private_data" style="display: none;">
+                        <th>Protocol parse_rfq_omit_private_data</th>
+                                            </tr>
+                                    <tr id="tbdex-detail-row-0-Protocol-parse_rfq" style="display: none;">
+                        <th>Protocol parse_rfq</th>
+                                            </tr>
+                                        </tbody>
+</table>
+
+<script>
+document.querySelectorAll('.tbdex-expand-collapse-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const specRow = this.closest('.spec-row');
+        
+        const detailRows = document.querySelectorAll(`[id^="tbdex-detail-row-${specRow.dataset.specIndex}"]`);
+      
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            this.setAttribute('aria-expanded', 'false');
+            this.textContent = '+';
+            detailRows.forEach(row => row.style.display = 'none');
+        } else {
+            this.setAttribute('aria-expanded', 'true');
+            this.textContent = '-';
+            detailRows.forEach(row => row.style.display = 'table-row');
+        }
+    });
+});
+</script>
+<!-- tbdex CONFORMANCE TABLE: END -->
+    <hr/>
+  <!-- spec-releases-matrix-end -->
 
       <hr/>
       <h1>Web5 Spec Compliance Report</h1>
