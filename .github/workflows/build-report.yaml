@@ -48,3 +48,9 @@ jobs:
           # keep the conformance json files
           clean-exclude: |
             spec-conformance*.json
+
+      - name: Update Spec Releases Conformance Matrix Dashboard
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@main
+        with:
+          git-token: ${{ secrets.GITHUB_TOKEN }}
+          html-report-write-mode: true

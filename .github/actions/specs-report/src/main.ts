@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import { readActionInputs } from './action-inputs'
 import { handleCIReport } from './ci'
 import { handleSdkRelease, handleSpecRelease } from './spec-release'
+import { handleHtmlReleaseMatrixWrite } from './html-renderer'
 
 /**
  * The main function for the action.
@@ -11,7 +12,9 @@ export async function run(): Promise<void> {
     const inputs = readActionInputs()
     const { releaseMode } = inputs
 
-    if (releaseMode === 'none') {
+    if (inputs.htmlReportWrite) {
+      await handleHtmlReleaseMatrixWrite(inputs.gitToken, inputs.htmlReportFile)
+    } else if (releaseMode === 'none') {
       await handleCIReport(inputs)
     } else if (releaseMode === 'spec') {
       await handleSpecRelease(inputs)

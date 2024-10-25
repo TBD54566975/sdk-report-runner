@@ -33,6 +33,10 @@ export interface ActionInputs {
   specName: string
   /** The tag of the spec, eg: v2.0 */
   specTag: string
+  /** Whether to write the report to the HTML file */
+  htmlReportWrite: boolean
+  /** The path to the HTML file to write the report to (useful for PR previews) */
+  htmlReportFile: string
 }
 
 /**
@@ -41,11 +45,17 @@ export interface ActionInputs {
  */
 export const readActionInputs = (): ActionInputs => {
   const releaseMode = core.getInput('release-mode') || 'none'
-  const isDefaultReport = releaseMode === 'none'
+  const htmlReportWrite = core.getInput('html-report-write-mode') === 'true'
+  const isDefaultReport = releaseMode === 'none' && !htmlReportWrite
   const isReleaseSpecMode = releaseMode === 'spec'
   const isReleaseSdkMode = releaseMode === 'sdk'
-  if (!isReleaseSpecMode && !isReleaseSdkMode && !isDefaultReport) {
-    throw new Error('Invalid release mode')
+  if (
+    !isReleaseSpecMode &&
+    !isReleaseSdkMode &&
+    !isDefaultReport &&
+    !htmlReportWrite
+  ) {
+    throw new Error('Invalid execution mode')
   }
 
   const isReleaseMode = isReleaseSpecMode || isReleaseSdkMode
@@ -70,7 +80,7 @@ export const readActionInputs = (): ActionInputs => {
   const commentOnPr = core.getInput('comment-on-pr') === 'true'
   const packageName = core.getInput('package-name') || ''
   const gitToken = core.getInput('git-token', {
-    required: commentOnPr || isReleaseMode
+    required: commentOnPr || isReleaseMode || htmlReportWrite
   })
   const failOnMissingVectors =
     core.getInput('fail-on-missing-vectors') === 'true'
@@ -94,6 +104,8 @@ export const readActionInputs = (): ActionInputs => {
     required: isReleaseSdkMode
   })
 
+  const htmlReportFile = core.getInput('html-report-file') || 'index.html'
+
   return {
     junitReportPaths,
     specPath,
@@ -108,6 +120,8 @@ export const readActionInputs = (): ActionInputs => {
     releaseTag,
     releasePackageName,
     specName,
-    specTag
+    specTag,
+    htmlReportWrite,
+    htmlReportFile
   }
 }

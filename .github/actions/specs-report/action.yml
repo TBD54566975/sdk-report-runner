@@ -7,10 +7,10 @@ inputs:
     description:
       'Glob Path with the JUnit test vectors report, can be a single path or a
       list of paths in an array'
-    required: true # required if release-mode is "none"
+    required: false # required if release-mode is "none"
   spec-path:
     description: 'The relative path to the tbd spec submodule folder'
-    required: true # required if release-mode is "none"
+    required: false # required if release-mode is "none"
   suite-name-regex:
     description: 'The regex to filter the suite name'
     required: false
@@ -36,7 +36,8 @@ inputs:
     required: false
   git-token:
     description:
-      'The git token to add the comment to the PR (required for PR comments)'
+      'The git token to add the comment to the PR (required for PR comments) or
+      write the Conformance Matrix Report (required for HTML report write mode)'
     required: false
   fail-on-missing-vectors:
     description: 'Whether to fail the job if missing test vectors are found'
@@ -68,6 +69,14 @@ inputs:
   spec-tag:
     description: 'The tag of the spec release'
     required: false # required if release-mode is "spec"
+  html-report-write-mode:
+    description: 'Set to "true" to write the report to the HTML file'
+    required: false
+    default: 'false'
+  html-report-file:
+    description:
+      'The path to the HTML file to write the report to (useful for PR previews)'
+    required: false
 
 # Define your outputs here.
 outputs:
