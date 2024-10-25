@@ -7,7 +7,7 @@ on:
         type: string
         required: true
       specRepo:
-        description: "TBD Specs"
+        description: "TBD Specs Repo"
         type: choice
         required: true
         options:
@@ -143,3 +143,9 @@ jobs:
           extract-feature-on-test-case-name: ${{ steps.release-mode.outputs.EXTRACT_FEATURE }}
           prettify-feature: ${{ steps.release-mode.outputs.PRETTIFY_FEATURE }}
           git-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Spec Releases Conformance Matrix Dashboard
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@main
+        with:
+          git-token: ${{ secrets.GITHUB_TOKEN }}
+          html-report-write-mode: true
