@@ -38298,8 +38298,11 @@ const readActionInputs = () => {
     const isDefaultReport = releaseMode === 'none' && !htmlReportWrite;
     const isReleaseSpecMode = releaseMode === 'spec';
     const isReleaseSdkMode = releaseMode === 'sdk';
-    if (!isReleaseSpecMode && !isReleaseSdkMode && !isDefaultReport) {
-        throw new Error('Invalid release mode');
+    if (!isReleaseSpecMode &&
+        !isReleaseSdkMode &&
+        !isDefaultReport &&
+        !htmlReportWrite) {
+        throw new Error('Invalid execution mode');
     }
     const isReleaseMode = isReleaseSpecMode || isReleaseSdkMode;
     const junitReportPaths = core.getInput('junit-report-paths', {
