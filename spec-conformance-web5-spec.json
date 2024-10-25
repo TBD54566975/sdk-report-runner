@@ -1,0 +1,50 @@
+{
+  "specReleases": [
+    {
+      "version": "v1.0.0",
+      "releaseLink": "https://github.com/TBD54566975/web5-spec/releases/tag/v1.0.0",
+      "testVectors": {
+        "srcLink": "https://github.com/TBD54566975/web5-spec/tree/v1.0.0/test-vectors",
+        "cases": {
+          "Credentials": [
+            "create",
+            "verify"
+          ],
+          "CryptoEd25519": [
+            "sign",
+            "verify"
+          ],
+          "CryptoEs256k": [
+            "sign",
+            "verify"
+          ],
+          "DidDht": [
+            "create",
+            "resolve"
+          ],
+          "DidJwk": [
+            "resolve"
+          ],
+          "DidWeb": [
+            "resolve"
+          ],
+          "PortableDid": [
+            "parse"
+          ],
+          "PresentationExchange": [
+            "create_presentation_from_credentials",
+            "evaluate_presentation",
+            "select_credentials",
+            "validate_definition",
+            "validate_submission"
+          ],
+          "VcJwt": [
+            "decode",
+            "verify"
+          ]
+        }
+      },
+      "sdks": {}
+    }
+  ]
+}
