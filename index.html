@@ -15,7 +15,103 @@
     <hr/>
 
     <h2>Web5 Spec Releases</h2>
-    <p>No data available <em>yet</em>.</p>
+    <!-- web5-spec CONFORMANCE TABLE: BEGIN -->
+<table role="grid" aria-label="web5-spec Conformance Table">
+    <thead>
+        <tr>
+            <th scope="col">Specification</th>
+                    </tr>
+    </thead>
+    <tbody>
+                    <tr class="spec-row" data-spec-index="0">
+                <!-- Specification Column -->
+                <th scope="row">
+                    <button class="web5-spec-expand-collapse-btn spec-conformance-table-expand-collapse-btn" aria-expanded="false">+</button>
+                    <a href="https://github.com/TBD54566975/web5-spec/releases/tag/v1.0.0">v1.0.0</a>
+                    <a href="https://github.com/TBD54566975/web5-spec/tree/v1.0.0/test-vectors" aria-label="Test vectors for v1.0.0">(tests)</a>
+                </th>
+
+                <!-- SDK Columns -->
+                            </tr>
+                                                <tr id="web5-spec-detail-row-0-Credentials-create" style="display: none;">
+                        <th>Credentials create</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-Credentials-verify" style="display: none;">
+                        <th>Credentials verify</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-CryptoEd25519-sign" style="display: none;">
+                        <th>CryptoEd25519 sign</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-CryptoEd25519-verify" style="display: none;">
+                        <th>CryptoEd25519 verify</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-CryptoEs256k-sign" style="display: none;">
+                        <th>CryptoEs256k sign</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-CryptoEs256k-verify" style="display: none;">
+                        <th>CryptoEs256k verify</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidDht-create" style="display: none;">
+                        <th>DidDht create</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-DidDht-resolve" style="display: none;">
+                        <th>DidDht resolve</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidJwk-resolve" style="display: none;">
+                        <th>DidJwk resolve</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-DidWeb-resolve" style="display: none;">
+                        <th>DidWeb resolve</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-PortableDid-parse" style="display: none;">
+                        <th>PortableDid parse</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-PresentationExchange-create_presentation_from_credentials" style="display: none;">
+                        <th>PresentationExchange create_presentation_from_credentials</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-evaluate_presentation" style="display: none;">
+                        <th>PresentationExchange evaluate_presentation</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-select_credentials" style="display: none;">
+                        <th>PresentationExchange select_credentials</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-validate_definition" style="display: none;">
+                        <th>PresentationExchange validate_definition</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-PresentationExchange-validate_submission" style="display: none;">
+                        <th>PresentationExchange validate_submission</th>
+                                            </tr>
+                                                                <tr id="web5-spec-detail-row-0-VcJwt-decode" style="display: none;">
+                        <th>VcJwt decode</th>
+                                            </tr>
+                                    <tr id="web5-spec-detail-row-0-VcJwt-verify" style="display: none;">
+                        <th>VcJwt verify</th>
+                                            </tr>
+                                        </tbody>
+</table>
+
+<script>
+document.querySelectorAll('.web5-spec-expand-collapse-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const specRow = this.closest('.spec-row');
+        
+        const detailRows = document.querySelectorAll(`[id^="web5-spec-detail-row-${specRow.dataset.specIndex}"]`);
+      
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            this.setAttribute('aria-expanded', 'false');
+            this.textContent = '+';
+            detailRows.forEach(row => row.style.display = 'none');
+        } else {
+            this.setAttribute('aria-expanded', 'true');
+            this.textContent = '-';
+            detailRows.forEach(row => row.style.display = 'table-row');
+        }
+    });
+});
+</script>
+<!-- web5-spec CONFORMANCE TABLE: END -->
     <hr/>
 
     <h2>TBDEX Spec Releases</h2>
