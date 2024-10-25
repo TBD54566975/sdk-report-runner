@@ -47,7 +47,7 @@ const getConformanceHtmlTable = async (
   const fileName = `./spec-conformance-${specType}.json`
   const file = await readGhPagesFile(fileName, gitToken)
   if (!file) {
-    throw new Error(`Spec Conformance File ${fileName} not found`)
+    return '<p>No data available <em>yet</em>.</p>'
   }
   const conformanceData: ConformanceData = JSON.parse(file.content)
   return generateConformanceDataHTML(specType, conformanceData)
