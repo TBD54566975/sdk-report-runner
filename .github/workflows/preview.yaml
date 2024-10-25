@@ -47,7 +47,7 @@ jobs:
           umbrella-dir: pr-preview
           action: auto
       - name: Update Spec Releases Conformance Matrix Dashboard
-        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@leordev/spec-releases-matrix # todo: adjust
+        uses: TBD54566975/sdk-report-runner/.github/actions/specs-report@main
         if: github.event.action != 'closed'
         with:
           git-token: ${{ secrets.GITHUB_TOKEN }}
